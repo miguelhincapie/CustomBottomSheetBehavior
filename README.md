@@ -50,4 +50,6 @@ Working on get parallax image behavior and toolbar like google maps.
 [BottomSheetDialogFragment - How to set expanded height (or min top offset)](http://stackoverflow.com/questions/36030879/bottomsheetdialogfragment-how-to-set-expanded-height-or-min-top-offset)
 
 
-[My Profile](http://stackoverflow.com/users/1332549/miguelhincapiec?tab=profile)
+<a href="http://stackoverflow.com/users/1332549/miguelhincapiec">
+<img src="http://stackoverflow.com/users/flair/1332549.png" width="208" height="58" alt="profile for MiguelHincapieC at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for MiguelHincapieC at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+</a>
