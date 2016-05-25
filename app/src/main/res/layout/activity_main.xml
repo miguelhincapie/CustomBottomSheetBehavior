@@ -52,7 +52,7 @@
         app:behavior_peekHeight="100dp"
         android:id="@+id/bottom_sheet"
         app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BottomSheetBehaviorGoogleMapsLike"
-        app:anchorPoint="350dp">
+        app:anchorPoint="200dp">
 
         <include
             layout="@layout/bottom_sheet_content"
