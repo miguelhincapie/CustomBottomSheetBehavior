@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CustomBottomSheetBehavior</string>
+    <string name="action_settings">Settings</string>
+</resources>
