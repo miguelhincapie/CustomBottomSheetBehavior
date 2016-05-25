@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         /**
          * If we want to listen for states callback
          */
-        BottomSheetBehavior
         CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorlayout);
         View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
         BottomSheetBehaviorGoogleMapsLike behavior = BottomSheetBehaviorGoogleMapsLike.from(bottomSheet);
