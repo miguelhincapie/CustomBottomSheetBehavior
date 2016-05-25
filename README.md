@@ -18,13 +18,13 @@ STATE_EXPANDED.<br><br>
 
 You can use `setBottomSheetCallback` like you do in original `BottomSheetBehavior`<br><br>
 The XML (without anything about parallax image like google maps) looks like:<br>
-CoordinatorLayout<br>
-    FrameLayout or map fragment<br>
-    AppBarLayout<br>
-        CollapsingToolbarLayout<br>
-            Toolbar<br>
-    NestedScrollView<br>
-        LinearLayout<br>
+`<CoordinatorLayout>`
+    `<FrameLayout>`
+    `<AppBarLayout>`
+        `<CollapsingToolbarLayout>`
+            `<Toolbar>`
+    `<NestedScrollView>`
+        `<LinearLayout>`
 
 
 ## Help or improvements
