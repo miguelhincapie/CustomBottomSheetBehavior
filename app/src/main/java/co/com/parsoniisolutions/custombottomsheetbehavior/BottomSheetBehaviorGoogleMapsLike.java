@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
+import java.util.Vector;
 
 /**
  ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,7 +135,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
 
     private WeakReference<View> mNestedScrollingChildRef;
 
-    private BottomSheetCallback mCallback;
+    private Vector<BottomSheetCallback> mCallback;
 
     private VelocityTracker mVelocityTracker;
 
@@ -169,9 +170,9 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
          * Getting the anchorPoint...
          */
         mAnchorPoint = DEFAULT_ANCHOR_POINT;
-        a = context.obtainStyledAttributes(attrs, R.styleable.BottomSheetBehavior);
+        a = context.obtainStyledAttributes(attrs, R.styleable.CustomBottomSheetBehavior);
         if (attrs != null)
-            mAnchorPoint = (int) a.getDimension(R.styleable.BottomSheetBehavior_anchorPoint, 0);
+            mAnchorPoint = (int) a.getDimension(R.styleable.CustomBottomSheetBehavior_anchorPoint, 0);
         a.recycle();
 
 
@@ -480,12 +481,15 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     }
 
     /**
-     * Sets a callback to be notified of bottom sheet events.
+     * Adds a callback to be notified of bottom sheet events.
      *
      * @param callback The callback to notify when bottom sheet events occur.
      */
-    public void setBottomSheetCallback(BottomSheetCallback callback) {
-        mCallback = callback;
+    public void addBottomSheetCallback(BottomSheetCallback callback) {
+        if (mCallback == null)
+            mCallback = new Vector<>();
+
+        mCallback.add(callback);
     }
 
     /**
@@ -551,7 +555,20 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
         mState = state;
         View bottomSheet = mViewRef.get();
         if (bottomSheet != null && mCallback != null) {
-            mCallback.onStateChanged(bottomSheet, state);
+//            mCallback.onStateChanged(bottomSheet, state);
+            notifyStateChangedToListeners(bottomSheet, state);
+        }
+    }
+
+    private void notifyStateChangedToListeners(@NonNull View bottomSheet, @State int newState) {
+        for (BottomSheetCallback bottomSheetCallback:mCallback) {
+            bottomSheetCallback.onStateChanged(bottomSheet, newState);
+        }
+    }
+
+    private void notifyOnSlideToListeners(@NonNull View bottomSheet, float slideOffset) {
+        for (BottomSheetCallback bottomSheetCallback:mCallback) {
+            bottomSheetCallback.onSlide(bottomSheet, slideOffset);
         }
     }
 
@@ -684,9 +701,12 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
         View bottomSheet = mViewRef.get();
         if (bottomSheet != null && mCallback != null) {
             if (top > mMaxOffset) {
-                mCallback.onSlide(bottomSheet, (float) (mMaxOffset - top) / mPeekHeight);
+//                mCallback.onSlide(bottomSheet, (float) (mMaxOffset - top) / mPeekHeight);
+                notifyOnSlideToListeners(bottomSheet, (float) (mMaxOffset - top) / mPeekHeight);
             } else {
-                mCallback.onSlide(bottomSheet,
+//                mCallback.onSlide(bottomSheet,
+//                        (float) (mMaxOffset - top) / ((mMaxOffset - mMinOffset)));
+                notifyOnSlideToListeners(bottomSheet,
                         (float) (mMaxOffset - top) / ((mMaxOffset - mMinOffset)));
             }
         }
