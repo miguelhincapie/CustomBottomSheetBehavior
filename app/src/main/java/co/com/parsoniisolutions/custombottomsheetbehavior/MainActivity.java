@@ -12,9 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    TextView bottomSheetTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,5 +66,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
         });
+
+        bottomSheetTextView = (TextView) bottomSheet.findViewById(R.id.bottom_sheet_title);
     }
 }
