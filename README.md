@@ -1,34 +1,22 @@
 # CustomBottomSheetBehavior like Google Maps for Android
-Simple Android Studio Project giving an Activity and a "CoordinatorLayout.Behavior<V>" extended trying 
-to get same 3 states behavior than Google Maps.
+Android Studio Project using Support Library focused on get Google Maps 3 states behavior including background image parallax and toolbars animations.
 
 ## Example
 [![CustomBottomSheetBehavior](https://raw.githubusercontent.com/miguelhincapie/CustomBottomSheetBehavior/master/CustomBottomSheetBehaviorLikeGoogleMaps3states.gif)]
 
-## Motivation
-Spend more than 2 days looking snipet of code or stackoverflow answers about it with no lucky.
-
 ## What I did?
-I took the code from BottomSheetBehavior.java from Support Library 23.4.0 and added one state for anchor mode, so now you have:<br>
+1. I took the code from BottomSheetBehavior.java from Support Library 23.4.0 and added one state for anchor mode, so now you have:<br>
 STATE_HIDDEN<br>
 STATE_COLLAPSED<br>
 STATE_DRAGGING<br>
 STATE_ANCHOR_POINT<br>
 STATE_EXPANDED.<br><br>
 
-You can use `setBottomSheetCallback` like you do in original `BottomSheetBehavior`<br><br>
-The XML (without anything about parallax image like google maps) looks like:<br>
-```xml
-<CoordinatorLayout>
-    <FrameLayout>
-    <AppBarLayout>
-        <CollapsingToolbarLayout>
-            <Toolbar>
-    <NestedScrollView>
-        <LinearLayout>
-```
+2. Create Behaviors for FAB, ToolBars and ImageView.
 
 
+## Motivation
+Spend more than 3 days looking snipet of code or stackoverflow answers about it with no lucky.
 
 ## Help or improvements
 Do you want to help?
