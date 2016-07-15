@@ -3,4 +3,8 @@
     <declare-styleable name="CustomBottomSheetBehavior">
         <attr name="anchorPoint" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="BackdropBottomSheetBehavior_Params">
+        <attr name="behavior_backdrop_peekHeight" format="dimension"/>
+    </declare-styleable>
 </resources>
