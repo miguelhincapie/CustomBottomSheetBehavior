@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.ViewPropertyAnimator;
 import android.view.Window;
 import android.view.WindowManager;
@@ -104,6 +105,9 @@ public class SecondAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mAnchorPoint = bottomSheetBehavior.mAnchorPoint;
 
         AppBarLayout appBarLayout = (AppBarLayout)child;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appBarLayout.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        }
         mToolbar = (Toolbar) appBarLayout.getChildAt(0);
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
