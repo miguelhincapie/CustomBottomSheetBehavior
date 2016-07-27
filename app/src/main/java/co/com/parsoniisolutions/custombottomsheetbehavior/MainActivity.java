@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    int[] mDrawables = {
+            R.drawable.cheese_3,
+            R.drawable.cheese_3,
+            R.drawable.cheese_3,
+            R.drawable.cheese_3,
+            R.drawable.cheese_3,
+            R.drawable.cheese_3
+    };
 
     TextView bottomSheetTextView;
 
@@ -68,5 +79,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bottomSheetTextView = (TextView) bottomSheet.findViewById(R.id.bottom_sheet_title);
+
+        ItemPagerAdapter adapter = new ItemPagerAdapter(this,mDrawables);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(adapter);
     }
 }
