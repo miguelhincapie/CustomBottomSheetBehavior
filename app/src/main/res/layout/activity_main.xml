@@ -56,14 +56,22 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <ImageView
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:behavior_backdrop_peekHeight="80dp"
+        android:background="@color/colorAccent"
+        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior">
+    </android.support.v4.view.ViewPager>
+   <!-- <ImageView
         android:id="@+id/bottomsheet_backdrop2"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
         android:src="@drawable/cheese_3"
         app:behavior_backdrop_peekHeight="80dp"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior"/>
+        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior"/>-->
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
