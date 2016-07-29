@@ -7,16 +7,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -26,12 +23,9 @@ import android.widget.FrameLayout;
  */
 public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
-    private static final String TAG = ScrollingAppBarLayoutBehavior.class.getSimpleName();
-
     boolean mInit = false;
 
     private Context mContext;
-    private float mInitialY;
     private boolean mVisible = true;
 
     private int mPeekHeight;
@@ -55,18 +49,14 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
         if (!mInit) {
-            init(child);
+            init();
             return false;
         }
-        //Log.d(TAG,"dependency Y "+dependency.getY());
-        //Log.d(TAG,"dependency Height "+dependency.getHeight());
-        //Log.d(TAG,"peek Point  "+ (dependency.getHeight() - mPeekHeight));
-        setAppBarVisible((AppBarLayout) child,dependency.getY() == dependency.getHeight() - mPeekHeight);
+        setAppBarVisible((AppBarLayout) child,dependency.getY() >= dependency.getHeight() - mPeekHeight);
         return true;
     }
 
-    private void init(final View child) {
-        mInitialY = child.getY();
+    private void init() {
         setStatusBarBackgroundVisible(true);
         mInit = true;
     }
@@ -81,13 +71,9 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             return;
 
         if(mAppBarYValueAnimator == null || !mAppBarYValueAnimator.isRunning()){
-            Log.d(TAG,"setAppBarVisible "+visible);
             int startY = (int) child.getY();
             int endY = visible ? (int) child.getY() + child.getHeight() + getStatusBarHeight()
                     : (int) child.getY() - child.getHeight() - getStatusBarHeight();
-
-            Log.d(TAG,"startY "+startY);
-            Log.d(TAG,"endY "+endY);
 
             mAppBarYValueAnimator = ValueAnimator.ofFloat(startY,endY);
             mAppBarYValueAnimator.setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
@@ -96,7 +82,6 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float value = (Float) animation.getAnimatedValue();
                     child.setY(value);
-                    //if(!visible && value == getStatusBarHeight())
 
                 }
             });
@@ -150,7 +135,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
                     mStatusBarBackground.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     mStatusBarBackground.getLayoutParams().height = statusBarHeight;
                     ((ViewGroup) w.getDecorView()).addView(mStatusBarBackground);
-                    mStatusBarBackground.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+                    mStatusBarBackground.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
                 }
             }
         }else {
