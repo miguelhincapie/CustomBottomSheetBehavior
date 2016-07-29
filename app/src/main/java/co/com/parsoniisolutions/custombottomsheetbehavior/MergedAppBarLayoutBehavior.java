@@ -17,7 +17,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -31,8 +30,6 @@ import android.widget.TextView;
  *
  */
 public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
-
-    private static final String TAG = MergedAppBarLayoutBehavior.class.getSimpleName();
 
     boolean mInit = false;
 
@@ -73,27 +70,27 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             init(child);
             return false;
         }
-        Log.d(TAG,"dependency Y "+dependency.getY());
 
         if(isDependencyYBelowAnchorPoint(dependency)){
-            Log.d(TAG,"case 1");
+
             setToolbarVisible(false,child);
 
         }else if(isDependencyYBetweenAnchorPointAndToolbar(child,dependency)){
-            Log.d(TAG,"case 2");
+
             setToolbarVisible(true,child);
             setPartialBackGroundHeight(0);
 
         } else if(isDependencyYBelowToolbar(child, dependency) && ! isDependencyYReachTop(dependency)){
-            Log.d(TAG,"case 3");
+
             if(isStatusBarVisible())
                 setStatusBarBackgroundVisible(false);
             if(isTitleVisible())
                 setTitleVisible(false);
             setFullBackGroundColor(android.R.color.transparent);
             setPartialBackGroundHeight((int)((child.getHeight() + child.getY()) - dependency.getY()));
+
         } else if(isDependencyYBelowStatusToolbar(child, dependency) || isDependencyYReachTop(dependency)){
-            Log.d(TAG,"case 4");
+
             if(!isStatusBarVisible())
                 setStatusBarBackgroundVisible(true);
             if(!isTitleVisible())
@@ -149,7 +146,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     }
 
     private void setFullBackGroundColor(@ColorRes int colorRes){
-        Log.d(TAG,"setFullBackGroundColor");
         mToolbar.setBackgroundColor(ContextCompat.getColor(mContext,colorRes));
     }
 
@@ -221,7 +217,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             return;
 
         if(mTitleAlphaValueAnimator == null || !mTitleAlphaValueAnimator.isRunning()){
-            Log.d(TAG,"setTitleVisible "+visible);
             mToolbar.setTitle(mToolbarTitle);
             int startAlpha = visible ? 0 : 1;
             int endAlpha = visible ? 1 : 0;
@@ -267,7 +262,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
                     mStatusBarBackground.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     mStatusBarBackground.getLayoutParams().height = statusBarHeight;
                     ((ViewGroup) w.getDecorView()).addView(mStatusBarBackground);
-                    mStatusBarBackground.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+                    mStatusBarBackground.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
                 }
             }
         }else {
