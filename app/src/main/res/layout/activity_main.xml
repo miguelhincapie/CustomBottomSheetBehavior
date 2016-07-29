@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+
     tools:context="co.com.parsoniisolutions.custombottomsheetbehavior.MainActivity">
 
     <FrameLayout
@@ -27,7 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.FirstAppBarLayoutBehavior">
+        app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"
+        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.ScrollingAppBarLayoutBehavior">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -43,45 +45,44 @@
         android:background="@android:color/transparent"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:tag="modal-appbar"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.SecondAppBarLayoutBehavior">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/expanded_toolbar"
+        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.MergedAppBarLayoutBehavior"
+        app:behavior_merged_appbar_anchor_point="@dimen/anchor_point">
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:title="@string/key_binding_default_toolbar_name"
-            app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"/>
-
+            android:layout_height="match_parent">
+            <View
+                android:id="@+id/background"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/colorPrimary"
+                android:layout_gravity="bottom"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/expanded_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:title="@string/key_binding_default_toolbar_name"
+                app:navigationIcon="@drawable/ic_close_white_24dp"/>
+        </FrameLayout>
     </android.support.design.widget.AppBarLayout>
-
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:behavior_backdrop_peekHeight="80dp"
+        app:behavior_backdrop_peekHeight="@dimen/bottom_sheet_peek_height"
         android:background="@color/colorAccent"
         app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior">
     </android.support.v4.view.ViewPager>
-   <!-- <ImageView
-        android:id="@+id/bottomsheet_backdrop2"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/cheese_3"
-        app:behavior_backdrop_peekHeight="80dp"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior"/>-->
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:behavior_peekHeight="80dp"
+        app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
         android:id="@+id/bottom_sheet"
-
         app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BottomSheetBehaviorGoogleMapsLike"
-        app:anchorPoint="200dp">
+        app:anchorPoint="@dimen/anchor_point">
 
         <include
             layout="@layout/bottom_sheet_content"
