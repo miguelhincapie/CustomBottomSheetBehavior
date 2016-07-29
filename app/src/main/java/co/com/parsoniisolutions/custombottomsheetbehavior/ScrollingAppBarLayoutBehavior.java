@@ -52,7 +52,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             init();
             return false;
         }
-        setAppBarVisible((AppBarLayout) child,dependency.getY() >= dependency.getHeight() - mPeekHeight);
+        setAppBarVisible((AppBarLayout)child,dependency.getY() >= dependency.getHeight() - mPeekHeight);
         return true;
     }
 
@@ -65,23 +65,22 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         this.mPeekHeight = peekHeight;
     }
 
-    public void setAppBarVisible(final AppBarLayout child, final boolean visible){
+    public void setAppBarVisible(final AppBarLayout appBarLayout, final boolean visible){
 
         if(visible == mVisible)
             return;
 
         if(mAppBarYValueAnimator == null || !mAppBarYValueAnimator.isRunning()){
-            int startY = (int) child.getY();
-            int endY = visible ? (int) child.getY() + child.getHeight() + getStatusBarHeight()
-                    : (int) child.getY() - child.getHeight() - getStatusBarHeight();
 
-            mAppBarYValueAnimator = ValueAnimator.ofFloat(startY,endY);
+            mAppBarYValueAnimator = ValueAnimator.ofFloat(
+                    (int) appBarLayout.getY(),
+                    visible ? (int) appBarLayout.getY() + appBarLayout.getHeight() + getStatusBarHeight() :
+                              (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
             mAppBarYValueAnimator.setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
             mAppBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    float value = (Float) animation.getAnimatedValue();
-                    child.setY(value);
+                    appBarLayout.setY((Float) animation.getAnimatedValue());
 
                 }
             });
@@ -96,10 +95,10 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    mVisible = visible;
                     if(!visible)
                         setStatusBarBackgroundVisible(false);
+                    mVisible = visible;
+                    super.onAnimationEnd(animation);
                 }
             });
             mAppBarYValueAnimator.start();
