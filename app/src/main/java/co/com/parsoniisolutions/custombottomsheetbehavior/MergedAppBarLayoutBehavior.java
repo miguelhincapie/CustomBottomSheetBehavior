@@ -143,7 +143,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mInitialY = child.getY();
 
         child.setVisibility(mHidden ? View.INVISIBLE : View.VISIBLE);
-        setStatusBarBackgroundVisible(!mHidden);
+        setStatusBarBackgroundVisible(mHidden);
         setFullBackGroundColor(mHidden ? android.R.color.transparent : R.color.colorPrimary);
         setPartialBackGroundHeight(0);
         mTitleTextView.setText(mToolbarTitle);
