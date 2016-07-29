@@ -39,7 +39,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/expanded_appbarlayout"
+        android:id="@+id/merged_appbarlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
