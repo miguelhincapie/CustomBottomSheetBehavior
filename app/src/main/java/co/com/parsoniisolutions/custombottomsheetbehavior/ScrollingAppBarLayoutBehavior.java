@@ -14,7 +14,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -74,9 +73,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     private void init(View child) {
         setStatusBarBackgroundVisible(mVisible);
-        int childY = mVisible ? (int) child.getY() :
-                                (int) child.getY() - child.getHeight() - getStatusBarHeight();
-        child.setY(childY);
+        if(!mVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
         mInit = true;
     }
 
