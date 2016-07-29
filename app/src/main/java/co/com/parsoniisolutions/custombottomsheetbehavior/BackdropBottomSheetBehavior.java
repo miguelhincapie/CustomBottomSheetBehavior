@@ -32,16 +32,17 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
         if(!mInit){
             init(child, dependency);
+            return false;
         }
         if((mCurrentChildY = (int) ((dependency.getY()-mAnchorPointY) * mCollapsedY / (mCollapsedY-mAnchorPointY))) <= 0)
-            child.setY(0);
+            child.setY(mCurrentChildY = 0);
         else
             child.setY(mCurrentChildY);
         return true;
     }
 
     private void init(@NonNull View child, @NonNull View dependency){
-        mCollapsedY = (int) (dependency.getY() - mPeakHeight);
+        mCollapsedY = dependency.getHeight() - (2 * mPeakHeight);
         mAnchorPointY = child.getHeight();
         mCurrentChildY = (int) dependency.getY();
         mInit = true;
