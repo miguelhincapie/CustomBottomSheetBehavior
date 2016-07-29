@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior;
+package co.com.parsoniisolutions.custombottomsheetbehavior.sample;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +11,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import co.com.parsoniisolutions.custombottomsheetbehavior.lib.BottomSheetBehaviorGoogleMapsLike;
+import co.com.parsoniisolutions.custombottomsheetbehavior.lib.MergedAppBarLayoutBehavior;
+import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class MainActivity extends AppCompatActivity {
 

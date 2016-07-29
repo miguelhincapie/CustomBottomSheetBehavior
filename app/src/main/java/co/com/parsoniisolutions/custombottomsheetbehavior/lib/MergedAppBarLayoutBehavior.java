@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior;
+package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -19,7 +19,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -28,6 +27,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 /**
  *
@@ -59,7 +60,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-        TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.MergedAppBarLayoutBehavior_Params);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MergedAppBarLayoutBehavior_Params);
         setAnchorPoint(a.getDimensionPixelSize(R.styleable.MergedAppBarLayoutBehavior_Params_behavior_merged_appbar_anchor_point, 0));
         a.recycle();
     }

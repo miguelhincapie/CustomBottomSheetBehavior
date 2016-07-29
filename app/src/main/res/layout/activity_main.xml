@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
 
-    tools:context="co.com.parsoniisolutions.custombottomsheetbehavior.MainActivity">
+    tools:context=".sample.MainActivity">
 
     <FrameLayout
         android:id="@+id/dummy_framelayout_replacing_map"

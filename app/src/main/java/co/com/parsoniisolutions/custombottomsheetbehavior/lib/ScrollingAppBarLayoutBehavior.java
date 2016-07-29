@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior;
+package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -20,6 +20,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import co.com.parsoniisolutions.custombottomsheetbehavior.R;
+
 /**
  *
  */
@@ -39,7 +41,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     public ScrollingAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-        TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.ScrollingAppBarLayoutBehavior_Params);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollingAppBarLayoutBehavior_Params);
         setPeekHeight(a.getDimensionPixelSize(R.styleable.ScrollingAppBarLayoutBehavior_Params_behavior_scrolling_appbar_peek_height, 0));
         a.recycle();
     }
