@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.ScrollingAppBarLayoutBehavior">
+        app:layout_behavior="@string/ScrollingAppBarLayoutBehavior">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -45,7 +45,7 @@
         android:background="@android:color/transparent"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:tag="modal-appbar"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.MergedAppBarLayoutBehavior"
+        app:layout_behavior="@string/MergedAppBarLayoutBehavior"
         app:behavior_merged_appbar_anchor_point="@dimen/anchor_point">
         <FrameLayout
             android:layout_width="match_parent"
@@ -72,7 +72,7 @@
         android:layout_height="@dimen/anchor_point"
         app:behavior_backdrop_peekHeight="@dimen/bottom_sheet_peek_height"
         android:background="@color/colorAccent"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior">
+        app:layout_behavior="@string/BackDropBottomSheetBehavior">
     </android.support.v4.view.ViewPager>
 
     <android.support.v4.widget.NestedScrollView
@@ -81,7 +81,7 @@
         android:orientation="vertical"
         app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
         android:id="@+id/bottom_sheet"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BottomSheetBehaviorGoogleMapsLike"
+        app:layout_behavior="@string/BottomSheetBehaviorGoogleMapsLike"
         app:anchorPoint="@dimen/anchor_point">
 
         <include
@@ -99,6 +99,6 @@
         app:layout_anchorGravity="top|right|end"
         android:src="@drawable/ic_action_go"
         android:layout_margin="@dimen/fab_margin"
-        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.ScrollAwareFABBehavior"
+        app:layout_behavior="@string/ScrollAwareFABBehavior"
         android:clickable="true"/>
 </android.support.design.widget.CoordinatorLayout>
