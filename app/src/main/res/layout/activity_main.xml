@@ -69,7 +69,7 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="@dimen/anchor_point"
         app:behavior_backdrop_peekHeight="@dimen/bottom_sheet_peek_height"
         android:background="@color/colorAccent"
         app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.BackdropBottomSheetBehavior">
