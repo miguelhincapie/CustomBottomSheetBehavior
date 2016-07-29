@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior;
+package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,7 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -24,6 +23,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.util.Vector;
+
+import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 /**
  ~ Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior;
+package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.content.Context;
 import android.support.design.widget.AppBarLayout;

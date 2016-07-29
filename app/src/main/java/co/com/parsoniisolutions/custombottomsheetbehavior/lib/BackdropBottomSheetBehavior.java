@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior;
+package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,6 +7,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
+
+import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
 
@@ -18,7 +20,7 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     public BackdropBottomSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.BackdropBottomSheetBehavior_Params);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BackdropBottomSheetBehavior_Params);
         setPeekHeight(a.getDimensionPixelSize(R.styleable.BackdropBottomSheetBehavior_Params_behavior_backdrop_peekHeight, 0));
         a.recycle();
     }
