@@ -28,8 +28,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"
-        app:layout_behavior="@string/ScrollingAppBarLayoutBehavior"
-        android:fitsSystemWindows="true">
+        app:layout_behavior="@string/ScrollingAppBarLayoutBehavior">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
