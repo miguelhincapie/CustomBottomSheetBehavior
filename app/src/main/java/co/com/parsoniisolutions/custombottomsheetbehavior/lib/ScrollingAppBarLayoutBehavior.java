@@ -15,10 +15,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
@@ -34,7 +32,6 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     private boolean mVisible = true;
 
     private int mPeekHeight;
-    private View mStatusBarBackground;
 
     private ValueAnimator mAppBarYValueAnimator;
 
@@ -133,40 +130,17 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     }
 
     private void setStatusBarBackgroundVisible(boolean visible){
-        if(visible){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            if(visible){
                 Window window = ((Activity)mContext).getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.setStatusBarColor(ContextCompat.getColor(mContext,R.color.colorPrimaryDark));
-                mStatusBarBackground = new View(mContext);
-
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if(mStatusBarBackground == null){
-                    Window w = ((Activity)mContext).getWindow();
-                    w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    //status bar height
-                    int statusBarHeight = getStatusBarHeight();
-                    mStatusBarBackground = new View(mContext);
-                    mStatusBarBackground.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    mStatusBarBackground.getLayoutParams().height = statusBarHeight;
-                    ((ViewGroup) w.getDecorView()).addView(mStatusBarBackground);
-                    mStatusBarBackground.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
-                }
-            }
-        }else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            }else {
                 Window window = ((Activity)mContext).getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.setStatusBarColor(ContextCompat.getColor(mContext,android.R.color.transparent));
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                if(mStatusBarBackground != null){
-                    Window w = ((Activity)mContext).getWindow();
-                    ((ViewGroup) w.getDecorView()).removeView(mStatusBarBackground);
-                    mStatusBarBackground = null;
-                }
             }
         }
     }
