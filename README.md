@@ -21,7 +21,8 @@ Spend more than 3 days looking snipet of code or stackoverflow answers about it 
 ## Help or improvements
 Do you want to help?
 Wanna improve it?
-Go ahead!
+Go ahead!<br>
+Giving thx to akaN44 because he is helping so much.
 
 ## Current state
 Working on get parallax image behavior and toolbar like google maps.
