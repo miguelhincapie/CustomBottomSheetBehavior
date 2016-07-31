@@ -31,7 +31,7 @@ import android.widget.TextView;
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 /**
- *
+ * This behavior should be applied on an AppBarLayout... More Explanations coming soon
  */
 public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
@@ -44,13 +44,12 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private Context mContext;
     private float mAnchorPoint;
     private float mInitialY;
-    private boolean mHidden = true;
+    private boolean mVisible = false;
 
     private String mToolbarTitle;
 
     private Toolbar mToolbar;
     private TextView mTitleTextView;
-    private View mStatusBarBackground;
     private View mBackground;
     private View.OnClickListener mOnNavigationClickListener;
 
@@ -112,7 +111,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     @Override
     public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {
         return new SavedState(super.onSaveInstanceState(parent, child),
-                mHidden,
+                mVisible,
                 mToolbarTitle,
                 mCurrentTitleAlpha);
     }
@@ -121,7 +120,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     public void onRestoreInstanceState(CoordinatorLayout parent, View child, Parcelable state) {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
-        this.mHidden = ss.mHidden;
+        this.mVisible = ss.mVisible;
         this.mToolbarTitle = ss.mToolbarTitle;
         this.mCurrentTitleAlpha = ss.mTitleAlpha;
     }
@@ -143,9 +142,10 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
         mInitialY = child.getY();
 
-        child.setVisibility(mHidden ? View.INVISIBLE : View.VISIBLE);
-        setStatusBarBackgroundVisible(mHidden);
-        setFullBackGroundColor(mHidden ? android.R.color.transparent : R.color.colorPrimary);
+        child.setVisibility(mVisible ? View.VISIBLE : View.INVISIBLE);
+        setStatusBarBackgroundVisible(mVisible);
+
+        setFullBackGroundColor(mVisible && mCurrentTitleAlpha == 1 ? R.color.colorPrimary: android.R.color.transparent);
         setPartialBackGroundHeight(0);
         mTitleTextView.setText(mToolbarTitle);
         mTitleTextView.setAlpha(mCurrentTitleAlpha);
@@ -195,7 +195,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     private void setToolbarVisible(boolean visible, final View child){
         ViewPropertyAnimator mAppBarLayoutAnimation;
-        if(visible && mHidden){
+        if(visible && !mVisible){
             child.setY(-child.getHeight()/3);
             mAppBarLayoutAnimation = child.animate().setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
             mAppBarLayoutAnimation.setListener(new AnimatorListenerAdapter() {
@@ -214,11 +214,11 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
                     if (actionBar != null) {
                         actionBar.setDisplayHomeAsUpEnabled(true);
                     }
-                    mHidden = false;
+                    mVisible = true;
                 }
             });
             mAppBarLayoutAnimation.alpha(1).y(mInitialY).start();
-        }else if(!visible && !mHidden){
+        }else if(!visible && mVisible){
             mAppBarLayoutAnimation = child.animate().setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
             mAppBarLayoutAnimation.setListener(new AnimatorListenerAdapter() {
                 @Override
@@ -231,7 +231,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     ((AppCompatActivity)mContext).setSupportActionBar(null);
-                    mHidden = true;
+                    mVisible = false;
                 }
             });
             mAppBarLayoutAnimation.alpha(0).start();
@@ -267,58 +267,26 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     private boolean isStatusBarVisible(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            return ((Activity)mContext).getWindow().getStatusBarColor() == ContextCompat.getColor(mContext,R.color.colorPrimaryDark);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return mStatusBarBackground != null;
+            return ((Activity)mContext).getWindow().getStatusBarColor() ==
+                    ContextCompat.getColor(mContext,R.color.colorPrimaryDark);
         }
-        return false;
+        return true;
     }
 
     private void setStatusBarBackgroundVisible(boolean visible){
-        if(visible){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            if(visible){
                 Window window = ((Activity)mContext).getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.setStatusBarColor(ContextCompat.getColor(mContext,R.color.colorPrimaryDark));
-
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if(mStatusBarBackground == null){
-                    Window w = ((Activity)mContext).getWindow();
-                    w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    //status bar height
-                    int statusBarHeight = getStatusBarHeight();
-                    mStatusBarBackground = new View(mContext);
-                    mStatusBarBackground.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    mStatusBarBackground.getLayoutParams().height = statusBarHeight;
-                    ((ViewGroup) w.getDecorView()).addView(mStatusBarBackground);
-                    mStatusBarBackground.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
-                }
-            }
-        }else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            }else {
                 Window window = ((Activity)mContext).getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.setStatusBarColor(ContextCompat.getColor(mContext,android.R.color.transparent));
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                if(mStatusBarBackground != null){
-                    Window w = ((Activity)mContext).getWindow();
-                    ((ViewGroup) w.getDecorView()).removeView(mStatusBarBackground);
-                    mStatusBarBackground = null;
-                }
             }
         }
-    }
-
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = mContext.getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 
     public void setNavigationOnClickListener(View.OnClickListener listener){
@@ -337,20 +305,20 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     protected static class SavedState extends View.BaseSavedState {
 
-        final boolean mHidden;
+        final boolean mVisible;
         final String mToolbarTitle;
         final int mTitleAlpha;
 
         public SavedState(Parcel source) {
             super(source);
-            mHidden = source.readByte() != 0;
+            mVisible = source.readByte() != 0;
             mToolbarTitle = source.readString();
             mTitleAlpha = source.readInt();
         }
 
-        public SavedState(Parcelable superState, boolean hidden, String toolBarTitle, int titleAlpha) {
+        public SavedState(Parcelable superState, boolean visible, String toolBarTitle, int titleAlpha) {
             super(superState);
-            this.mHidden = hidden;
+            this.mVisible = visible;
             this.mToolbarTitle = toolBarTitle;
             this.mTitleAlpha = titleAlpha;
         }
@@ -358,7 +326,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeByte((byte) (mHidden ? 1 : 0));
+            out.writeByte((byte) (mVisible ? 1 : 0));
             out.writeString(mToolbarTitle);
             out.writeInt(mTitleAlpha);
         }
