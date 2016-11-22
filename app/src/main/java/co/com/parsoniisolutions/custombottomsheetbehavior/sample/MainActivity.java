@@ -1,10 +1,11 @@
 package co.com.parsoniisolutions.custombottomsheetbehavior.sample;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,30 +13,23 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 import co.com.parsoniisolutions.custombottomsheetbehavior.lib.BottomSheetBehaviorGoogleMapsLike;
 import co.com.parsoniisolutions.custombottomsheetbehavior.lib.MergedAppBarLayoutBehavior;
-import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class MainActivity extends AppCompatActivity {
 
-
-    int[] mDrawables = {
-            R.drawable.cheese_3,
-            R.drawable.cheese_3,
-            R.drawable.cheese_3,
-            R.drawable.cheese_3,
-            R.drawable.cheese_3,
-            R.drawable.cheese_3
-    };
-
     TextView bottomSheetTextView;
+    NestedScrollView bottomSheet;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        bottomSheet = (NestedScrollView) findViewById(R.id.bottom_sheet);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -47,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
          * If we want to listen for states callback
          */
         CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorlayout);
-        View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        NestedScrollView bottomSheet = (NestedScrollView) coordinatorLayout.findViewById(R.id.bottom_sheet);
         final BottomSheetBehaviorGoogleMapsLike behavior = BottomSheetBehaviorGoogleMapsLike.from(bottomSheet);
         behavior.addBottomSheetCallback(new BottomSheetBehaviorGoogleMapsLike.BottomSheetCallback() {
             @Override
@@ -81,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         AppBarLayout mergedAppBarLayout = (AppBarLayout) findViewById(R.id.merged_appbarlayout);
         MergedAppBarLayoutBehavior mergedAppBarLayoutBehavior = MergedAppBarLayoutBehavior.from(mergedAppBarLayout);
-        mergedAppBarLayoutBehavior.setToolbarTitle("Title Dummy");
+        mergedAppBarLayoutBehavior.setToolbarTitle("Filtruj i sortuj");
         mergedAppBarLayoutBehavior.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,9 +84,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bottomSheetTextView = (TextView) bottomSheet.findViewById(R.id.bottom_sheet_title);
-        ItemPagerAdapter adapter = new ItemPagerAdapter(this,mDrawables);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(adapter);
     }
 
 }

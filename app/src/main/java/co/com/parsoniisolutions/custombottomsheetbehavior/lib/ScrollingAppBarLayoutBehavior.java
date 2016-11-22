@@ -20,9 +20,6 @@ import android.view.WindowManager;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
-/**
- *
- */
 public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
     private static final String TAG = ScrollingAppBarLayoutBehavior.class.getSimpleName();
@@ -54,8 +51,9 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             init(child);
             return false;
         }
-        setAppBarVisible((AppBarLayout)child,dependency.getY() >= dependency.getHeight() - mPeekHeight);
-        return true;
+
+        setAppBarVisible((AppBarLayout) child, dependency.getY() >= dependency.getHeight() - mPeekHeight);
+        return false;
     }
 
     @Override
@@ -72,7 +70,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     private void init(View child) {
         setStatusBarBackgroundVisible(mVisible);
-        if(!mVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
+        if (!mVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
         mInit = true;
     }
 
@@ -80,17 +78,16 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         this.mPeekHeight = peekHeight;
     }
 
-    public void setAppBarVisible(final AppBarLayout appBarLayout, final boolean visible){
-
-        if(visible == mVisible)
+    public void setAppBarVisible(final AppBarLayout appBarLayout, final boolean visible) {
+        if (visible == mVisible)
             return;
 
-        if(mAppBarYValueAnimator == null || !mAppBarYValueAnimator.isRunning()){
+        if (mAppBarYValueAnimator == null || !mAppBarYValueAnimator.isRunning()) {
 
             mAppBarYValueAnimator = ValueAnimator.ofFloat(
                     (int) appBarLayout.getY(),
                     visible ? (int) appBarLayout.getY() + appBarLayout.getHeight() + getStatusBarHeight() :
-                              (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
+                            (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
             mAppBarYValueAnimator.setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
             mAppBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -102,18 +99,8 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             mAppBarYValueAnimator.addListener(new AnimatorListenerAdapter() {
 
                 @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    if(visible)
-                        setStatusBarBackgroundVisible(true);
-                }
-
-                @Override
                 public void onAnimationEnd(Animator animation) {
-                    if(!visible)
-                        setStatusBarBackgroundVisible(false);
                     mVisible = visible;
-                    super.onAnimationEnd(animation);
                 }
             });
             mAppBarYValueAnimator.start();
@@ -129,18 +116,18 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         return result;
     }
 
-    private void setStatusBarBackgroundVisible(boolean visible){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            if(visible){
-                Window window = ((Activity)mContext).getWindow();
+    private void setStatusBarBackgroundVisible(boolean visible) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (visible) {
+                Window window = ((Activity) mContext).getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.setStatusBarColor(ContextCompat.getColor(mContext,R.color.colorPrimaryDark));
-            }else {
-                Window window = ((Activity)mContext).getWindow();
+                window.setStatusBarColor(ContextCompat.getColor(mContext, R.color.colorPrimaryDark));
+            } else {
+                Window window = ((Activity) mContext).getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(mContext,android.R.color.transparent));
+                window.setStatusBarColor(ContextCompat.getColor(mContext, android.R.color.transparent));
             }
         }
     }
