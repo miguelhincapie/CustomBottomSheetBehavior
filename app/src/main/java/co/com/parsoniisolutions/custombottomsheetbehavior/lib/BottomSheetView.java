@@ -14,12 +14,12 @@ import android.widget.TextView;
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class BottomSheetView extends NestedScrollView {
-    private static final int LEFT_MARGIN = 115;
     private LinearLayout bottomSheetContainer;
     private TextView bottomSheetTitle;
     private ViewGroup titleContainer;
     private int bottomSheetTitleBackgroundColor;
     private int maxTextTranslation = -1;
+    private int appBarTextLeftDistance;
 
     public BottomSheetView(Context context) {
         super(context);
@@ -58,7 +58,7 @@ public class BottomSheetView extends NestedScrollView {
 
     public void translateTextLeft(float translationInPercent) {
         if (maxTextTranslation == -1) {
-            maxTextTranslation = bottomSheetTitle.getLeft() - LEFT_MARGIN;
+            maxTextTranslation = bottomSheetTitle.getLeft() - appBarTextLeftDistance;
         }
         bottomSheetTitle.setTranslationX(-maxTextTranslation * (translationInPercent / 100));
     }
@@ -74,5 +74,9 @@ public class BottomSheetView extends NestedScrollView {
         bottomSheetTitle.setTextColor(Color.rgb((int) (255 * (colorChangePercent / 100)),
                 (int) (255 * (colorChangePercent / 100)),
                 (int) (255 * (colorChangePercent / 100))));
+    }
+
+    public void setAppBarTextLeftDistance(int appBarTextLeftDistance) {
+        this.appBarTextLeftDistance = appBarTextLeftDistance;
     }
 }

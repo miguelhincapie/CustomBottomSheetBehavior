@@ -1,8 +1,5 @@
 package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -21,7 +18,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
-import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -40,7 +36,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     private Context mContext;
     private float mAnchorPoint;
-    private float mInitialY;
     private boolean mVisible = false;
 
     private String mToolbarTitle;
@@ -50,8 +45,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private View mBackground;
     private View.OnClickListener mOnNavigationClickListener;
 
-    private ValueAnimator mTitleAlphaValueAnimator;
     private int mCurrentTitleAlpha = 0;
+    private OnLayoutBehaviorReadyListener onLayoutBehaviorReadyListener;
 
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -74,9 +69,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         }
 
         if (isDependencyYBelowAnchorPoint(dependency)) {
-
             setToolbarVisible(false, child);
-
         } else if (isDependencyYBetweenAnchorPointAndToolbar(child, dependency)) {
             setToolbarVisible(true, child);
             setFullBackGroundColor(android.R.color.transparent);
@@ -124,8 +117,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         if (mTitleTextView == null)
             return;
 
-        mInitialY = child.getY();
-
         child.setVisibility(mVisible ? View.VISIBLE : View.INVISIBLE);
 
         setFullBackGroundColor(mVisible && mCurrentTitleAlpha == 1 ? R.color.colorPrimary : android.R.color.transparent);
@@ -133,6 +124,9 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mTitleTextView.setText(mToolbarTitle);
         mTitleTextView.setAlpha(mCurrentTitleAlpha);
         mInit = true;
+        if (onLayoutBehaviorReadyListener != null) {
+            onLayoutBehaviorReadyListener.onLayoutBehaviourReady();
+        }
     }
 
     private boolean isDependencyYBelowAnchorPoint(@NonNull View dependency) {
@@ -177,47 +171,19 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     }
 
     private void setToolbarVisible(boolean visible, final View child) {
-        ViewPropertyAnimator mAppBarLayoutAnimation;
         if (visible && !mVisible) {
-            child.setY(-child.getHeight() / 3);
-            mAppBarLayoutAnimation = child.animate().setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            mAppBarLayoutAnimation.setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    child.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    ((AppCompatActivity) mContext).setSupportActionBar(mToolbar);
-                    mToolbar.setNavigationOnClickListener(mOnNavigationClickListener);
-                    ActionBar actionBar = ((AppCompatActivity) mContext).getSupportActionBar();
-                    if (actionBar != null) {
-                        actionBar.setDisplayHomeAsUpEnabled(true);
-                    }
-                    mVisible = true;
-                }
-            });
-            mAppBarLayoutAnimation.alpha(1).y(mInitialY).start();
+            child.setVisibility(View.VISIBLE);
+            ((AppCompatActivity) mContext).setSupportActionBar(mToolbar);
+            mToolbar.setNavigationOnClickListener(mOnNavigationClickListener);
+            ActionBar actionBar = ((AppCompatActivity) mContext).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+            mVisible = true;
         } else if (!visible && mVisible) {
-            mAppBarLayoutAnimation = child.animate().setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            mAppBarLayoutAnimation.setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    child.setVisibility(View.INVISIBLE);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    ((AppCompatActivity) mContext).setSupportActionBar(null);
-                    mVisible = false;
-                }
-            });
-            mAppBarLayoutAnimation.alpha(0).start();
+            child.setVisibility(View.INVISIBLE);
+            ((AppCompatActivity) mContext).setSupportActionBar(null);
+            mVisible = false;
         }
     }
 
@@ -244,8 +210,16 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             this.mToolbar.setTitle(title);
     }
 
+    public TextView getTitleTextView() {
+        return mTitleTextView;
+    }
+
     public void setAnchorPoint(float anchorPoint) {
         this.mAnchorPoint = anchorPoint;
+    }
+
+    public void setOnLayoutBehaviorReadyListener(OnLayoutBehaviorReadyListener onLayoutBehaviorReadyListener) {
+        this.onLayoutBehaviorReadyListener = onLayoutBehaviorReadyListener;
     }
 
     protected static class SavedState extends View.BaseSavedState {

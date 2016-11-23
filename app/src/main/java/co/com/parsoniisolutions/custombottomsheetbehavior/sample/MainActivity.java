@@ -9,13 +9,18 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 import co.com.parsoniisolutions.custombottomsheetbehavior.lib.BottomSheetBehaviorGoogleMapsLike;
+import co.com.parsoniisolutions.custombottomsheetbehavior.lib.BottomSheetView;
 import co.com.parsoniisolutions.custombottomsheetbehavior.lib.MergedAppBarLayoutBehavior;
+import co.com.parsoniisolutions.custombottomsheetbehavior.lib.OnLayoutBehaviorReadyListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
          * If we want to listen for states callback
          */
         CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorlayout);
-        NestedScrollView bottomSheet = (NestedScrollView) coordinatorLayout.findViewById(R.id.bottom_sheet);
+        final BottomSheetView bottomSheet = (BottomSheetView) coordinatorLayout.findViewById(R.id.bottom_sheet);
         final BottomSheetBehaviorGoogleMapsLike behavior = BottomSheetBehaviorGoogleMapsLike.from(bottomSheet);
         behavior.addBottomSheetCallback(new BottomSheetBehaviorGoogleMapsLike.BottomSheetCallback() {
             @Override
@@ -74,8 +79,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         AppBarLayout mergedAppBarLayout = (AppBarLayout) findViewById(R.id.merged_appbarlayout);
-        MergedAppBarLayoutBehavior mergedAppBarLayoutBehavior = MergedAppBarLayoutBehavior.from(mergedAppBarLayout);
+        final MergedAppBarLayoutBehavior mergedAppBarLayoutBehavior = MergedAppBarLayoutBehavior.from(mergedAppBarLayout);
         mergedAppBarLayoutBehavior.setToolbarTitle("Filtruj i sortuj");
+        mergedAppBarLayoutBehavior.setOnLayoutBehaviorReadyListener(new OnLayoutBehaviorReadyListener() {
+            @Override
+            public void onLayoutBehaviourReady() {
+                bottomSheet.setAppBarTextLeftDistance(mergedAppBarLayoutBehavior.getTitleTextView().getLeft());
+            }
+        });
+
         mergedAppBarLayoutBehavior.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,5 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
         bottomSheetTextView = (TextView) bottomSheet.findViewById(R.id.bottom_sheet_title);
     }
+
 
 }

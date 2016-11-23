@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Filtruj i sortuj"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 

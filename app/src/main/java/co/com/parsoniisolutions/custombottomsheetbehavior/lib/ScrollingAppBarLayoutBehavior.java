@@ -3,20 +3,15 @@ package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
@@ -69,7 +64,6 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     }
 
     private void init(View child) {
-        setStatusBarBackgroundVisible(mVisible);
         if (!mVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
         mInit = true;
     }
@@ -114,22 +108,6 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             result = mContext.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
-    }
-
-    private void setStatusBarBackgroundVisible(boolean visible) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (visible) {
-                Window window = ((Activity) mContext).getWindow();
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.setStatusBarColor(ContextCompat.getColor(mContext, R.color.colorPrimaryDark));
-            } else {
-                Window window = ((Activity) mContext).getWindow();
-                window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(mContext, android.R.color.transparent));
-            }
-        }
     }
 
     protected static class SavedState extends View.BaseSavedState {
