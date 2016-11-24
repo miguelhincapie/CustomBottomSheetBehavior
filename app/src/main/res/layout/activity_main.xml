@@ -40,7 +40,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         app:anchorPoint="@dimen/anchor_point"
-        app:behavior_peekHeight="54dp"
+        app:behavior_peekHeight="@dimen/peek_height"
         app:layout_behavior="@string/BottomSheetBehaviorGoogleMapsLike">
 
         <include
@@ -77,4 +77,33 @@
                 app:title="@string/key_binding_default_toolbar_name" />
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/show_result_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        app:behavior_show_result_button_anchor_point="@dimen/anchor_point"
+        app:layout_behavior="co.com.parsoniisolutions.custombottomsheetbehavior.lib.ShowResultButtonBehavior">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/divider" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:text="Show results"
+            android:textAllCaps="true"
+            android:textColor="@color/bottomSheetTitleBackground"
+            android:visibility="visible" />
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

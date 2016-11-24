@@ -2,6 +2,8 @@ package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.NestedScrollView;
@@ -14,12 +16,16 @@ import android.widget.TextView;
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class BottomSheetView extends NestedScrollView {
+    private static final int MAX_PERCENT = 100;
+    private static final int MAX_HEX = 255;
     private LinearLayout bottomSheetContainer;
     private TextView bottomSheetTitle;
     private ViewGroup titleContainer;
     private int bottomSheetTitleBackgroundColor;
-    private int maxTextTranslation = -1;
+    private int maxHorizontalTextTranslation = -1;
+    private int maxVerticalTranslation = -1;
     private int appBarTextLeftDistance;
+    private int appBarTextTopDistance;
 
     public BottomSheetView(Context context) {
         super(context);
@@ -57,26 +63,42 @@ public class BottomSheetView extends NestedScrollView {
     }
 
     public void translateTextLeft(float translationInPercent) {
-        if (maxTextTranslation == -1) {
-            maxTextTranslation = bottomSheetTitle.getLeft() - appBarTextLeftDistance;
+        if (maxHorizontalTextTranslation == -1) {
+            maxHorizontalTextTranslation = bottomSheetTitle.getLeft() - appBarTextLeftDistance;
         }
-        bottomSheetTitle.setTranslationX(-maxTextTranslation * (translationInPercent / 100));
+        bottomSheetTitle.setTranslationX(-maxHorizontalTextTranslation * (translationInPercent / MAX_PERCENT));
+    }
+
+    public void translateTextBottom(float translationInPercent) {
+        if (maxVerticalTranslation == -1) {
+            maxVerticalTranslation = bottomSheetTitle.getTop() - appBarTextTopDistance;
+        }
+
+        bottomSheetTitle.setTranslationY(-maxVerticalTranslation * (translationInPercent / MAX_PERCENT));
     }
 
 
     public void animateBackgroundColor(float alphaInPercent) {
         titleContainer.setBackgroundColor(ColorUtils
                 .setAlphaComponent(bottomSheetTitleBackgroundColor,
-                        (int) (255 * (alphaInPercent / 100))));
+                        convertPercentToHex(alphaInPercent)));
     }
 
     public void animateTextColor(float colorChangePercent) {
-        bottomSheetTitle.setTextColor(Color.rgb((int) (255 * (colorChangePercent / 100)),
-                (int) (255 * (colorChangePercent / 100)),
-                (int) (255 * (colorChangePercent / 100))));
+        int hexColorValue = convertPercentToHex(colorChangePercent);
+        bottomSheetTitle.setTextColor(Color.rgb(hexColorValue, hexColorValue, hexColorValue));
+    }
+
+    @IntRange(from = 0x0, to = 0xFF)
+    private int convertPercentToHex(@FloatRange(from = 0f, to = 100f) float percentValue) {
+        return (int) (MAX_HEX * (percentValue / MAX_PERCENT));
     }
 
     public void setAppBarTextLeftDistance(int appBarTextLeftDistance) {
         this.appBarTextLeftDistance = appBarTextLeftDistance;
+    }
+
+    public void setAppBarTextTopDistance(int appBarTextTopDistance) {
+        this.appBarTextTopDistance = appBarTextTopDistance;
     }
 }

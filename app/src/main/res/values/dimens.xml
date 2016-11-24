@@ -1,4 +1,4 @@
 <resources>
     <dimen name="anchor_point">200dp</dimen>
-    <dimen name="bottom_sheet_peek_height">0dp</dimen>
+    <dimen name="peek_height">48dp</dimen>
 </resources>

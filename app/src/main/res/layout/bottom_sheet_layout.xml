@@ -7,10 +7,12 @@
     android:orientation="vertical"
     android:paddingBottom="16dp">
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/title_container"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
+        android:layout_height="@dimen/peek_height"
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:paddingBottom="8dp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
@@ -21,11 +23,11 @@
             android:id="@+id/bottom_sheet_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_gravity="center"
             android:text="Filtruj i sortuj"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
-    </RelativeLayout>
+    </FrameLayout>
 </LinearLayout>

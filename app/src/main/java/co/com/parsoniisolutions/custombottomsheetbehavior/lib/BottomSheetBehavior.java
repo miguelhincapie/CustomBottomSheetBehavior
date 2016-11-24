@@ -13,7 +13,6 @@ import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -40,7 +39,7 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
  * ~ See the License for the specific language governing permissions and
  * ~ limitations under the License.
  */
-public class BottomSheetBehaviorGoogleMapsLike extends CoordinatorLayout.Behavior<BottomSheetView> {
+public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetView> {
 
     /**
      * Callback for monitoring events about bottom sheets.
@@ -153,7 +152,7 @@ public class BottomSheetBehaviorGoogleMapsLike extends CoordinatorLayout.Behavio
     /**
      * Default constructor for instantiating BottomSheetBehaviors.
      */
-    public BottomSheetBehaviorGoogleMapsLike() {
+    public BottomSheetBehavior() {
     }
 
     /**
@@ -162,7 +161,7 @@ public class BottomSheetBehaviorGoogleMapsLike extends CoordinatorLayout.Behavio
      * @param context The {@link Context}.
      * @param attrs   The {@link AttributeSet}.
      */
-    public BottomSheetBehaviorGoogleMapsLike(Context context, AttributeSet attrs) {
+    public BottomSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
                 android.support.design.R.styleable.BottomSheetBehavior_Params);
@@ -371,6 +370,7 @@ public class BottomSheetBehaviorGoogleMapsLike extends CoordinatorLayout.Behavio
         }
 
         child.translateTextLeft(translationInPercent);
+        child.translateTextBottom(translationInPercent);
 
         float alphaInPercent = ((bottomSheetTop - 50) / (300f - 50)) * 100f;
 
@@ -803,24 +803,24 @@ public class BottomSheetBehaviorGoogleMapsLike extends CoordinatorLayout.Behavio
     }
 
     /**
-     * A utility function to get the {@link BottomSheetBehaviorGoogleMapsLike} associated with the {@code view}.
+     * A utility function to get the {@link BottomSheetBehavior} associated with the {@code view}.
      *
-     * @param view The {@link View} with {@link BottomSheetBehaviorGoogleMapsLike}.
-     * @return The {@link BottomSheetBehaviorGoogleMapsLike} associated with the {@code view}.
+     * @param view The {@link View} with {@link BottomSheetBehavior}.
+     * @return The {@link BottomSheetBehavior} associated with the {@code view}.
      */
     @SuppressWarnings("unchecked")
-    public static <V extends View> BottomSheetBehaviorGoogleMapsLike from(V view) {
+    public static <V extends View> BottomSheetBehavior from(V view) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof CoordinatorLayout.LayoutParams)) {
             throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
         }
         CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
                 .getBehavior();
-        if (!(behavior instanceof BottomSheetBehaviorGoogleMapsLike)) {
+        if (!(behavior instanceof BottomSheetBehavior)) {
             throw new IllegalArgumentException(
-                    "The view is not associated with BottomSheetBehaviorGoogleMapsLike");
+                    "The view is not associated with BottomSheetBehavior");
         }
-        return (BottomSheetBehaviorGoogleMapsLike) behavior;
+        return (BottomSheetBehavior) behavior;
     }
 
 }

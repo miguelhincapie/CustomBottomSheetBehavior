@@ -17,8 +17,6 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
-    private static final String TAG = ScrollingAppBarLayoutBehavior.class.getSimpleName();
-
     boolean mInit = false;
     private Context mContext;
     private boolean mVisible = true;

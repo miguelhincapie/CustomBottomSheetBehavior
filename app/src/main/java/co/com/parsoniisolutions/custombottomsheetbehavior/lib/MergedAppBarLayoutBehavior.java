@@ -1,5 +1,8 @@
 package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -18,42 +21,29 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
-import android.widget.FrameLayout;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
-/**
- * This behavior should be applied on an AppBarLayout... More Explanations coming soon
- */
 public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
-    private static final String TAG = MergedAppBarLayoutBehavior.class.getSimpleName();
-
-    boolean mInit = false;
-
-    private FrameLayout.LayoutParams mBackGroundLayoutParams;
-
-    private Context mContext;
-    private float mAnchorPoint;
-    private boolean mVisible = false;
-
-    private String mToolbarTitle;
-
-    private Toolbar mToolbar;
-    private TextView mTitleTextView;
-    private View mBackground;
-    private View.OnClickListener mOnNavigationClickListener;
-
-    private int mCurrentTitleAlpha = 0;
+    private boolean isInit = false;
+    private float anchorPoint;
+    private boolean isVisible = false;
+    private String toolbarTitle;
+    private Toolbar toolbar;
+    private TextView titleTextView;
+    private View.OnClickListener onNavigationClickListener;
+    private int currentTitleAlpha = 0;
     private OnLayoutBehaviorReadyListener onLayoutBehaviorReadyListener;
+    private ObjectAnimator currentCloseIconAnimator;
 
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MergedAppBarLayoutBehavior_Params);
-        setAnchorPoint(a.getDimensionPixelSize(R.styleable.MergedAppBarLayoutBehavior_Params_behavior_merged_appbar_anchor_point, 0));
-        a.recycle();
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MergedAppBarLayoutBehavior_Params);
+        setAnchorPoint(typedArray.getDimensionPixelSize(R.styleable.MergedAppBarLayoutBehavior_Params_behavior_merged_appbar_anchor_point, 0));
+        typedArray.recycle();
     }
 
     @Override
@@ -63,7 +53,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        if (!mInit) {
+        if (!isInit) {
             init(child);
             return false;
         }
@@ -71,70 +61,97 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         if (isDependencyYBelowAnchorPoint(dependency)) {
             setToolbarVisible(false, child);
         } else if (isDependencyYBetweenAnchorPointAndToolbar(child, dependency)) {
-            setToolbarVisible(true, child);
-            setFullBackGroundColor(android.R.color.transparent);
+            showOnlyCloseIconWithTransparentBackground(child);
         } else if (isDependencyYBelowToolbar(child, dependency) && !isDependencyYReachTop(dependency)) {
-            if (isTitleVisible())
-                setTitleVisible(false);
+            setTitleVisible(false);
             setFullBackGroundColor(android.R.color.transparent);
         } else if (isDependencyYBelowStatusToolbar(child, dependency) || isDependencyYReachTop(dependency)) {
-            if (!isTitleVisible())
-                setTitleVisible(true);
-            setFullBackGroundColor(R.color.colorPrimary);
+            showToolbarWithTitleAndColor();
         }
         return true;
+    }
+
+    private void showToolbarWithTitleAndColor() {
+        if (currentCloseIconAnimator != null && currentCloseIconAnimator.isRunning()) {
+            waitForFinishingCloseIconAnimationAndShowTitle();
+        } else {
+            setTitleVisible(true);
+            setFullBackGroundColor(R.color.colorPrimary);
+        }
+    }
+
+    private void waitForFinishingCloseIconAnimationAndShowTitle() {
+        currentCloseIconAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                setTitleVisible(true);
+                setFullBackGroundColor(R.color.colorPrimary);
+                currentCloseIconAnimator.removeListener(this);
+            }
+        });
+    }
+
+    private void showOnlyCloseIconWithTransparentBackground(View child) {
+        setTitleVisible(false);
+        if (!isVisible) {
+            showCloseButtonWithTranslateAnimation(child);
+        }
+        setToolbarVisible(true, child);
+        setFullBackGroundColor(android.R.color.transparent);
+    }
+
+    private void showCloseButtonWithTranslateAnimation(View child) {
+        currentCloseIconAnimator = ObjectAnimator.ofFloat(child, View.TRANSLATION_Y, -child.getHeight(), 0);
+        currentCloseIconAnimator.setDuration(200);
+        currentCloseIconAnimator.setInterpolator(new DecelerateInterpolator());
+        currentCloseIconAnimator.start();
     }
 
     @Override
     public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {
         return new SavedState(super.onSaveInstanceState(parent, child),
-                mVisible,
-                mToolbarTitle,
-                mCurrentTitleAlpha);
+                isVisible,
+                toolbarTitle,
+                currentTitleAlpha);
     }
 
     @Override
     public void onRestoreInstanceState(CoordinatorLayout parent, View child, Parcelable state) {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
-        this.mVisible = ss.mVisible;
-        this.mToolbarTitle = ss.mToolbarTitle;
-        this.mCurrentTitleAlpha = ss.mTitleAlpha;
+        this.isVisible = ss.mVisible;
+        this.toolbarTitle = ss.mToolbarTitle;
+        this.currentTitleAlpha = ss.mTitleAlpha;
     }
 
     private void init(@NonNull View child) {
-
         AppBarLayout appBarLayout = (AppBarLayout) child;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            appBarLayout.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
-        }
+        hideShadowForTransparentAppBarLayout(appBarLayout);
 
-        mToolbar = (Toolbar) appBarLayout.findViewById(R.id.expanded_toolbar);
-        mBackground = appBarLayout.findViewById(R.id.background);
-        mBackGroundLayoutParams = (FrameLayout.LayoutParams) mBackground.getLayoutParams();
-
-        mTitleTextView = findTitleTextView(mToolbar);
-        if (mTitleTextView == null)
-            return;
-
-        child.setVisibility(mVisible ? View.VISIBLE : View.INVISIBLE);
-
-        setFullBackGroundColor(mVisible && mCurrentTitleAlpha == 1 ? R.color.colorPrimary : android.R.color.transparent);
-        setPartialBackGroundHeight(0);
-        mTitleTextView.setText(mToolbarTitle);
-        mTitleTextView.setAlpha(mCurrentTitleAlpha);
-        mInit = true;
+        toolbar = (Toolbar) appBarLayout.findViewById(R.id.expanded_toolbar);
+        titleTextView = findTitleTextView(toolbar);
+        child.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+        setFullBackGroundColor(isVisible && currentTitleAlpha == 1 ? R.color.colorPrimary : android.R.color.transparent);
+        titleTextView.setText(toolbarTitle);
+        titleTextView.setAlpha(currentTitleAlpha);
+        isInit = true;
         if (onLayoutBehaviorReadyListener != null) {
             onLayoutBehaviorReadyListener.onLayoutBehaviourReady();
         }
     }
 
+    private void hideShadowForTransparentAppBarLayout(AppBarLayout appBarLayout) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appBarLayout.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        }
+    }
+
     private boolean isDependencyYBelowAnchorPoint(@NonNull View dependency) {
-        return dependency.getY() > mAnchorPoint;
+        return dependency.getY() > anchorPoint;
     }
 
     private boolean isDependencyYBetweenAnchorPointAndToolbar(@NonNull View child, @NonNull View dependency) {
-        return dependency.getY() <= mAnchorPoint && dependency.getY() > child.getY() + child.getHeight();
+        return dependency.getY() <= anchorPoint && dependency.getY() > child.getY() + child.getHeight();
     }
 
     private boolean isDependencyYBelowToolbar(@NonNull View child, @NonNull View dependency) {
@@ -149,13 +166,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return dependency.getY() == 0;
     }
 
-    private void setPartialBackGroundHeight(int height) {
-        mBackGroundLayoutParams.height = height;
-        mBackground.setLayoutParams(mBackGroundLayoutParams);
-    }
-
     private void setFullBackGroundColor(@ColorRes int colorRes) {
-        mToolbar.setBackgroundColor(ContextCompat.getColor(mContext, colorRes));
+        toolbar.setBackgroundColor(ContextCompat.getColor(toolbar.getContext(), colorRes));
     }
 
     private TextView findTitleTextView(Toolbar toolbar) {
@@ -163,59 +175,57 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             View toolBarChild = toolbar.getChildAt(i);
             if (toolBarChild instanceof TextView &&
                     ((TextView) toolBarChild).getText() != null &&
-                    ((TextView) toolBarChild).getText().toString().contentEquals(mContext.getResources().getString(R.string.key_binding_default_toolbar_name))) {
+                    ((TextView) toolBarChild).getText().toString().contentEquals(toolbar.getContext().getResources()
+                            .getString(R.string.key_binding_default_toolbar_name))) {
                 return (TextView) toolBarChild;
             }
         }
-        return null;
+        throw new IllegalStateException("Toolbar title view not found");
     }
 
     private void setToolbarVisible(boolean visible, final View child) {
-        if (visible && !mVisible) {
+        Context context = child.getContext();
+        if (visible && !isVisible) {
             child.setVisibility(View.VISIBLE);
-            ((AppCompatActivity) mContext).setSupportActionBar(mToolbar);
-            mToolbar.setNavigationOnClickListener(mOnNavigationClickListener);
-            ActionBar actionBar = ((AppCompatActivity) mContext).getSupportActionBar();
+            ((AppCompatActivity) context).setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(onNavigationClickListener);
+            ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
-            mVisible = true;
-        } else if (!visible && mVisible) {
+            isVisible = true;
+        } else if (!visible && isVisible) {
             child.setVisibility(View.INVISIBLE);
-            ((AppCompatActivity) mContext).setSupportActionBar(null);
-            mVisible = false;
+            ((AppCompatActivity) context).setSupportActionBar(null);
+            isVisible = false;
         }
-    }
-
-    private boolean isTitleVisible() {
-        return mTitleTextView.getAlpha() == 1;
     }
 
     private void setTitleVisible(boolean visible) {
 
-        if ((visible && mTitleTextView.getAlpha() == 1) ||
-                (!visible && mTitleTextView.getAlpha() == 0))
+        if ((visible && titleTextView.getAlpha() == 1) ||
+                (!visible && titleTextView.getAlpha() == 0))
             return;
 
-        mTitleTextView.setAlpha(visible ? 1 : 0);
+        titleTextView.setAlpha(visible ? 1 : 0);
     }
 
     public void setNavigationOnClickListener(View.OnClickListener listener) {
-        this.mOnNavigationClickListener = listener;
+        this.onNavigationClickListener = listener;
     }
 
     public void setToolbarTitle(String title) {
-        this.mToolbarTitle = title;
-        if (this.mToolbar != null)
-            this.mToolbar.setTitle(title);
+        this.toolbarTitle = title;
+        if (this.toolbar != null)
+            this.toolbar.setTitle(title);
     }
 
     public TextView getTitleTextView() {
-        return mTitleTextView;
+        return titleTextView;
     }
 
     public void setAnchorPoint(float anchorPoint) {
-        this.mAnchorPoint = anchorPoint;
+        this.anchorPoint = anchorPoint;
     }
 
     public void setOnLayoutBehaviorReadyListener(OnLayoutBehaviorReadyListener onLayoutBehaviorReadyListener) {
