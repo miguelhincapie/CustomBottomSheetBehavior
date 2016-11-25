@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "co.com.parsoniisolutions.custombottomsheetbehavior"
-        minSdkVersion 17
-        targetSdkVersion 23
+        minSdkVersion 16
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
