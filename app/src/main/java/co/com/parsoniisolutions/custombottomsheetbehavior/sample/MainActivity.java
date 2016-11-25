@@ -11,10 +11,10 @@ import android.widget.RadioGroup;
 import java.util.concurrent.TimeUnit;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
-import co.com.parsoniisolutions.custombottomsheetbehavior.lib.BottomSheetBehavior;
-import co.com.parsoniisolutions.custombottomsheetbehavior.lib.BottomSheetView;
-import co.com.parsoniisolutions.custombottomsheetbehavior.lib.MergedAppBarLayoutBehavior;
-import co.com.parsoniisolutions.custombottomsheetbehavior.lib.OnLayoutBehaviorReadyListener;
+import pl.lukjar.bottom_sheet_library.BottomSheetBehavior;
+import pl.lukjar.bottom_sheet_library.BottomSheetView;
+import pl.lukjar.bottom_sheet_library.MergedAppBarLayoutBehavior;
+import pl.lukjar.bottom_sheet_library.OnLayoutBehaviorReadyListener;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 

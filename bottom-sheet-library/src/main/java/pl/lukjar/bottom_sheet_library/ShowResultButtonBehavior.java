@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
+package pl.lukjar.bottom_sheet_library;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,8 +6,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
-
-import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class ShowResultButtonBehavior extends CoordinatorLayout.Behavior<View> {
     private boolean isButtonVisible = false;

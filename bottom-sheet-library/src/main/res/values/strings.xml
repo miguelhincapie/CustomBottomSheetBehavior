@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">bottom-sheet-library</string>
+    <string name="key_binding_default_toolbar_name">Modal-Toolbar-Title</string>
+    <string name="BackDropBottomSheetBehavior">co.com.parsoniisolutions.custombottomsheetbehavior.lib.BackdropBottomSheetBehavior</string>
+    <string name="BottomSheetBehaviorGoogleMapsLike">pl.lukjar.bottom_sheet_library.BottomSheetBehavior</string>
+    <string name="ScrollAwareFABBehavior">co.com.parsoniisolutions.custombottomsheetbehavior.lib.ScrollAwareFABBehavior</string>
+    <string name="MergedAppBarLayoutBehavior">pl.lukjar.bottom_sheet_library.MergedAppBarLayoutBehavior</string>
+    <string name="ScrollingAppBarLayoutBehavior">pl.lukjar.bottom_sheet_library.ScrollingAppBarLayoutBehavior</string>
+</resources>

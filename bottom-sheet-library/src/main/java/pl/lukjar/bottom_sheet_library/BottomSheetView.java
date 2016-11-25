@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
+package pl.lukjar.bottom_sheet_library;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class BottomSheetView extends NestedScrollView {
     private static final int MAX_PERCENT = 100;

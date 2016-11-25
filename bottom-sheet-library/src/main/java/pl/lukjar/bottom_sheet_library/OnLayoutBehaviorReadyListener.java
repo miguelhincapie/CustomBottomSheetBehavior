@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
+package pl.lukjar.bottom_sheet_library;
 
 public interface OnLayoutBehaviorReadyListener {
 

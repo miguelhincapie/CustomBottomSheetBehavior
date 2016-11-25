@@ -1,4 +1,4 @@
-package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
+package pl.lukjar.bottom_sheet_library;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -23,8 +23,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.util.Vector;
-
-import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 /**
  * ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -781,8 +779,8 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
             out.writeInt(state);
         }
 
-        public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>() {
+        public static final Creator<SavedState> CREATOR =
+                new Creator<SavedState>() {
                     @Override
                     public SavedState createFromParcel(Parcel source) {
                         return new SavedState(source);
