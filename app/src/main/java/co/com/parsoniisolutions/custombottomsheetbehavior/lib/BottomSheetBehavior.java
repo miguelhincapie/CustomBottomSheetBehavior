@@ -41,6 +41,8 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
  */
 public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetView> {
 
+    private static final float MAX_PERCENT = 100f;
+
     /**
      * Callback for monitoring events about bottom sheets.
      */
@@ -164,10 +166,10 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     public BottomSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
-                android.support.design.R.styleable.BottomSheetBehavior_Params);
+                android.support.design.R.styleable.BottomSheetBehavior_Layout);
         setPeekHeight(a.getDimensionPixelSize(
-                android.support.design.R.styleable.BottomSheetBehavior_Params_behavior_peekHeight, 0));
-        setHideable(a.getBoolean(android.support.design.R.styleable.BottomSheetBehavior_Params_behavior_hideable, false));
+                android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, 0));
+        setHideable(a.getBoolean(android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
         a.recycle();
 
         /**
@@ -362,34 +364,25 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     }
 
     private void animateTitle(BottomSheetView child, int bottomSheetTop) {
-        float translationInPercent = ((400f - bottomSheetTop) / 400f) * 100f;
-        if (translationInPercent > 100) {
-            translationInPercent = 100;
-        } else if (translationInPercent < 0) {
-            translationInPercent = 0;
-        }
+        float translationInPercent = adjustPercentValue((((float) mAnchorPoint - bottomSheetTop)
+                / (float) mAnchorPoint) * MAX_PERCENT);
+        float alphaInPercent = adjustPercentValue(((bottomSheetTop - 50) / (300f - 50)) * MAX_PERCENT);
+        float colorChangePercent = adjustPercentValue((bottomSheetTop / 200f) * MAX_PERCENT);
 
         child.translateTextLeft(translationInPercent);
         child.translateTextBottom(translationInPercent);
-
-        float alphaInPercent = ((bottomSheetTop - 50) / (300f - 50)) * 100f;
-
-        if (alphaInPercent > 100) {
-            alphaInPercent = 100;
-        } else if (alphaInPercent < 0) {
-            alphaInPercent = 0;
-        }
-
-        child.animateBackgroundColor(alphaInPercent);
-
-        float colorChangePercent = (bottomSheetTop / 200f) * 100f;
-
-        if (colorChangePercent > 100) {
-            colorChangePercent = 100;
-        } else if (colorChangePercent < 0) {
-            colorChangePercent = 0;
-        }
+        child.transformTextSize(translationInPercent);
         child.animateTextColor(colorChangePercent);
+        child.animateBackgroundColor(alphaInPercent);
+    }
+
+    private float adjustPercentValue(float percentValue) {
+        if (percentValue > MAX_PERCENT) {
+            return MAX_PERCENT;
+        } else if (percentValue < 0) {
+            return 0;
+        }
+        return percentValue;
     }
 
     @Override

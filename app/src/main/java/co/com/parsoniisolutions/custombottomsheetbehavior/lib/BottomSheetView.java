@@ -26,6 +26,8 @@ public class BottomSheetView extends NestedScrollView {
     private int maxVerticalTranslation = -1;
     private int appBarTextLeftDistance;
     private int appBarTextTopDistance;
+    private float appBarTextSize;
+    private float textScaleValue;
 
     public BottomSheetView(Context context) {
         super(context);
@@ -77,6 +79,18 @@ public class BottomSheetView extends NestedScrollView {
         bottomSheetTitle.setTranslationY(-maxVerticalTranslation * (translationInPercent / MAX_PERCENT));
     }
 
+    public void transformTextSize(float transformInPercent) {
+        if (appBarTextSize != 0) {
+            textScaleValue = appBarTextSize / bottomSheetTitle.getTextSize();
+        }
+        if (appBarTextSize > 0) {
+            bottomSheetTitle.setPivotX(5);
+            bottomSheetTitle.setPivotY(0);
+            bottomSheetTitle.setScaleX(1 - ((1 - textScaleValue) * transformInPercent / MAX_PERCENT));
+            bottomSheetTitle.setScaleY(1 - ((1 - textScaleValue) * transformInPercent / MAX_PERCENT));
+        }
+    }
+
 
     public void animateBackgroundColor(float alphaInPercent) {
         titleContainer.setBackgroundColor(ColorUtils
@@ -100,5 +114,9 @@ public class BottomSheetView extends NestedScrollView {
 
     public void setAppBarTextTopDistance(int appBarTextTopDistance) {
         this.appBarTextTopDistance = appBarTextTopDistance;
+    }
+
+    public void setAppBarTextSize(float appBarTextSize) {
+        this.appBarTextSize = appBarTextSize;
     }
 }

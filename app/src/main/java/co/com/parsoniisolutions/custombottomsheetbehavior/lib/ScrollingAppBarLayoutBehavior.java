@@ -17,9 +17,9 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
-    boolean mInit = false;
-    private Context mContext;
-    private boolean mVisible = true;
+    private boolean isInit = false;
+    private Context context;
+    private boolean isVisible = true;
 
     private int mPeekHeight;
 
@@ -27,7 +27,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     public ScrollingAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
+        this.context = context;
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollingAppBarLayoutBehavior_Params);
         setPeekHeight(a.getDimensionPixelSize(R.styleable.ScrollingAppBarLayoutBehavior_Params_behavior_scrolling_appbar_peek_height, 0));
         a.recycle();
@@ -40,7 +40,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        if (!mInit) {
+        if (!isInit) {
             init(child);
             return false;
         }
@@ -51,19 +51,19 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     @Override
     public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {
-        return new SavedState(super.onSaveInstanceState(parent, child), mVisible);
+        return new SavedState(super.onSaveInstanceState(parent, child), isVisible);
     }
 
     @Override
     public void onRestoreInstanceState(CoordinatorLayout parent, View child, Parcelable state) {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
-        this.mVisible = ss.mVisible;
+        this.isVisible = ss.isVisible;
     }
 
     private void init(View child) {
-        if (!mVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
-        mInit = true;
+        if (!isVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
+        isInit = true;
     }
 
     public void setPeekHeight(int peekHeight) {
@@ -71,7 +71,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     }
 
     public void setAppBarVisible(final AppBarLayout appBarLayout, final boolean visible) {
-        if (visible == mVisible)
+        if (visible == this.isVisible)
             return;
 
         if (mAppBarYValueAnimator == null || !mAppBarYValueAnimator.isRunning()) {
@@ -80,7 +80,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
                     (int) appBarLayout.getY(),
                     visible ? (int) appBarLayout.getY() + appBarLayout.getHeight() + getStatusBarHeight() :
                             (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
-            mAppBarYValueAnimator.setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
+            mAppBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
             mAppBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -92,7 +92,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mVisible = visible;
+                    ScrollingAppBarLayoutBehavior.this.isVisible = visible;
                 }
             });
             mAppBarYValueAnimator.start();
@@ -101,31 +101,31 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     private int getStatusBarHeight() {
         int result = 0;
-        int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            result = mContext.getResources().getDimensionPixelSize(resourceId);
+            result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
     }
 
     protected static class SavedState extends View.BaseSavedState {
 
-        final boolean mVisible;
+        final boolean isVisible;
 
         public SavedState(Parcel source) {
             super(source);
-            mVisible = source.readByte() != 0;
+            isVisible = source.readByte() != 0;
         }
 
         public SavedState(Parcelable superState, boolean visible) {
             super(superState);
-            this.mVisible = visible;
+            this.isVisible = visible;
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeByte((byte) (mVisible ? 1 : 0));
+            out.writeByte((byte) (isVisible ? 1 : 0));
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
