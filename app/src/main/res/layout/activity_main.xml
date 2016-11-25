@@ -1,98 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorlayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".sample.MainActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
-        android:id="@+id/overlay"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0"
-        android:background="@android:color/black"
-        app:layout_behavior="pl.lukjar.bottom_sheet_library.FadeInBehavior" />
+        android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/anchor_point"
-        android:background="@android:color/transparent"
-        android:visibility="gone">
+        <FrameLayout
+            android:id="@+id/overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@android:color/black"
+            app:layout_behavior="@string/FadeInBehavior" />
 
-        <ProgressBar
-            style="?android:attr/indeterminateProgressStyle"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/anchor_point"
+            android:background="@android:color/transparent"
+            android:visibility="gone">
+
+            <ProgressBar
+                style="?android:attr/indeterminateProgressStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"
+            app:layout_behavior="@string/ScrollingAppBarLayoutBehavior">
 
-    </FrameLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+        </android.support.design.widget.AppBarLayout>
 
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbarlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"
-        app:layout_behavior="@string/ScrollingAppBarLayoutBehavior">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <pl.lukjar.bottom_sheet_library.BottomSheetView
+            android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
-    </android.support.design.widget.AppBarLayout>
+            android:layout_height="match_parent"
+            app:anchorPoint="@dimen/anchor_point"
+            app:behavior_peekHeight="@dimen/peek_height"
+            app:layout_behavior="@string/ThreePhasesBottomSheetBehavior">
 
-    <pl.lukjar.bottom_sheet_library.BottomSheetView
-        android:id="@+id/bottom_sheet"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:anchorPoint="@dimen/anchor_point"
-        app:behavior_peekHeight="@dimen/peek_height"
-        app:layout_behavior="@string/BottomSheetBehaviorGoogleMapsLike">
+            <include
+                android:id="@+id/bottom_sheet_content"
+                layout="@layout/bottom_sheet_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </pl.lukjar.bottom_sheet_library.BottomSheetView>
 
-        <include
-            layout="@layout/bottom_sheet_content"
+        <pl.lukjar.bottom_sheet_library.MergedAppBarLayout
+            android:id="@+id/merged_appbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </pl.lukjar.bottom_sheet_library.BottomSheetView>
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:behavior_merged_appbar_anchor_point="@dimen/anchor_point"
+            app:layout_behavior="@string/MergedAppBarLayoutBehavior" />
 
-    <pl.lukjar.bottom_sheet_library.MergedAppBarLayout
-        android:id="@+id/merged_appbarlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:behavior_merged_appbar_anchor_point="@dimen/anchor_point"
-        app:layout_behavior="@string/MergedAppBarLayoutBehavior" />
-
-    <LinearLayout
-        android:id="@+id/show_result_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:clickable="true"
-        android:foreground="?attr/selectableItemBackground"
-        android:orientation="vertical"
-        app:behavior_show_result_button_anchor_point="@dimen/anchor_point"
-        app:layout_behavior="pl.lukjar.bottom_sheet_library.ShowResultButtonBehavior">
-
-        <View
+        <LinearLayout
+            android:id="@+id/show_result_button"
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/divider" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            app:behavior_show_result_button_anchor_point="@dimen/anchor_point"
+            app:layout_behavior="@string/ShowResultButtonBehavior">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:color/white"
-            android:gravity="center"
-            android:text="Show results"
-            android:textAllCaps="true"
-            android:textColor="@color/bottomSheetTitleBackground"
-            android:visibility="visible" />
-    </LinearLayout>
-</android.support.design.widget.CoordinatorLayout>
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/divider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@android:color/white"
+                android:gravity="center"
+                android:text="@string/show_results_button"
+                android:textAllCaps="true"
+                android:textColor="@color/bottomSheetTitleBackground" />
+        </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

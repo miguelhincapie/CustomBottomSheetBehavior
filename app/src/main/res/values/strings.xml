@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CustomBottomSheetBehavior</string>
+    <string name="show_results_button">Show results</string>
 </resources>

@@ -792,26 +792,4 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
                     }
                 };
     }
-
-    /**
-     * A utility function to get the {@link BottomSheetBehavior} associated with the {@code view}.
-     *
-     * @param view The {@link View} with {@link BottomSheetBehavior}.
-     * @return The {@link BottomSheetBehavior} associated with the {@code view}.
-     */
-    @SuppressWarnings("unchecked")
-    public static <V extends View> BottomSheetBehavior from(V view) {
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        if (!(params instanceof CoordinatorLayout.LayoutParams)) {
-            throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
-        }
-        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
-                .getBehavior();
-        if (!(behavior instanceof BottomSheetBehavior)) {
-            throw new IllegalArgumentException(
-                    "The view is not associated with BottomSheetBehavior");
-        }
-        return (BottomSheetBehavior) behavior;
-    }
-
 }

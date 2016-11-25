@@ -19,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
@@ -34,7 +33,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private TextView titleTextView;
     private View.OnClickListener onNavigationClickListener;
     private int currentTitleAlpha = 0;
-    private OnLayoutBehaviorReadyListener onLayoutBehaviorReadyListener;
+    private OnTitleTextViewReadyListener onTitleTextViewReadyListener;
     private ObjectAnimator currentCloseIconAnimator;
 
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
@@ -133,8 +132,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         titleTextView.setText(toolbarTitle);
         titleTextView.setAlpha(currentTitleAlpha);
         isInit = true;
-        if (onLayoutBehaviorReadyListener != null) {
-            onLayoutBehaviorReadyListener.onLayoutBehaviourReady();
+        if (onTitleTextViewReadyListener != null) {
+            onTitleTextViewReadyListener.onTitleTextViewReady(titleTextView);
         }
     }
 
@@ -226,8 +225,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         this.anchorPoint = anchorPoint;
     }
 
-    public void setOnLayoutBehaviorReadyListener(OnLayoutBehaviorReadyListener onLayoutBehaviorReadyListener) {
-        this.onLayoutBehaviorReadyListener = onLayoutBehaviorReadyListener;
+    public void setOnTitleTextViewReadyListener(OnTitleTextViewReadyListener onTitleTextViewReadyListener) {
+        this.onTitleTextViewReadyListener = onTitleTextViewReadyListener;
     }
 
     protected static class SavedState extends View.BaseSavedState {
@@ -270,19 +269,5 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
                         return new SavedState[size];
                     }
                 };
-    }
-
-    public static <V extends View> MergedAppBarLayoutBehavior from(V view) {
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        if (!(params instanceof CoordinatorLayout.LayoutParams)) {
-            throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
-        }
-        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
-                .getBehavior();
-        if (!(behavior instanceof MergedAppBarLayoutBehavior)) {
-            throw new IllegalArgumentException("The view is not associated with " +
-                    "MergedAppBarLayoutBehavior");
-        }
-        return (MergedAppBarLayoutBehavior) behavior;
     }
 }

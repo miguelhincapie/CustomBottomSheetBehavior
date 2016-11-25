@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.NestedScrollView;
@@ -13,12 +14,17 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import static pl.lukjar.bottom_sheet_library.BottomSheetBehavior.STATE_ANCHOR_POINT;
+import static pl.lukjar.bottom_sheet_library.BottomSheetBehavior.STATE_COLLAPSED;
+import static pl.lukjar.bottom_sheet_library.BottomSheetBehavior.STATE_EXPANDED;
+
 public class BottomSheetView extends NestedScrollView {
     private static final int MAX_PERCENT = 100;
     private static final int MAX_HEX = 255;
     private LinearLayout bottomSheetContainer;
     private TextView bottomSheetTitle;
     private ViewGroup titleContainer;
+    private BottomSheetBehavior layoutBehavior;
     private int bottomSheetTitleBackgroundColor;
     private int maxHorizontalTextTranslation = -1;
     private int maxVerticalTranslation = -1;
@@ -46,6 +52,21 @@ public class BottomSheetView extends NestedScrollView {
                 R.color.bottomSheetTitleBackground);
         titleContainer.setBackgroundColor(bottomSheetTitleBackgroundColor);
         bottomSheetTitle.setTextColor(Color.WHITE);
+        titleContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onTitleContainerClick();
+            }
+        });
+    }
+
+    private void onTitleContainerClick() {
+        lazyInitLayoutBehavior();
+        if (BottomSheetBehavior.STATE_COLLAPSED == layoutBehavior.getState()) {
+            layoutBehavior.setState(STATE_ANCHOR_POINT);
+        } else if (STATE_ANCHOR_POINT == layoutBehavior.getState()) {
+            layoutBehavior.setState(STATE_EXPANDED);
+        }
     }
 
     @Override
@@ -89,6 +110,48 @@ public class BottomSheetView extends NestedScrollView {
         }
     }
 
+    public void defaultBehaviorConnectionWith(MergedAppBarLayout mergedAppBarLayout) {
+        mergedAppBarLayout.setToolbarTitle(bottomSheetTitle.getText().toString());
+        mergedAppBarLayout.setTitleTextViewReadyListener(new OnTitleTextViewReadyListener() {
+            @Override
+            public void onTitleTextViewReady(TextView titleTextView) {
+                setAppBarTextLeftDistance(titleTextView.getLeft());
+                setAppBarTextTopDistance(titleTextView.getTop());
+                setAppBarTextSize(titleTextView.getTextSize());
+            }
+        });
+
+        mergedAppBarLayout.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                close();
+            }
+        });
+    }
+
+    public void close() {
+        lazyInitLayoutBehavior();
+        layoutBehavior.setState(STATE_COLLAPSED);
+    }
+
+    public void open() {
+        lazyInitLayoutBehavior();
+        layoutBehavior.setState(STATE_EXPANDED);
+    }
+
+    public void openToAnchorPosition() {
+        lazyInitLayoutBehavior();
+        layoutBehavior.setState(STATE_ANCHOR_POINT);
+    }
+
+    public boolean isInAnchorPosition() {
+        lazyInitLayoutBehavior();
+        return STATE_ANCHOR_POINT == layoutBehavior.getState();
+    }
+
+    public void lazyInitLayoutBehavior() {
+        layoutBehavior = findLayoutBehavior(this);
+    }
 
     public void animateBackgroundColor(float alphaInPercent) {
         titleContainer.setBackgroundColor(ColorUtils
@@ -116,5 +179,21 @@ public class BottomSheetView extends NestedScrollView {
 
     public void setAppBarTextSize(float appBarTextSize) {
         this.appBarTextSize = appBarTextSize;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static <V extends View> BottomSheetBehavior findLayoutBehavior(V view) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (!(params instanceof CoordinatorLayout.LayoutParams)) {
+            throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
+        }
+        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
+                .getBehavior();
+        if (!(behavior instanceof BottomSheetBehavior)) {
+            throw new IllegalArgumentException(
+                    "The view is not associated with BottomSheetBehavior");
+        }
+        return (BottomSheetBehavior) behavior;
     }
 }
