@@ -121,7 +121,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     }
 
     @SuppressWarnings("unchecked")
-    private static <V extends View> ScrollingAppBarLayoutBehavior from(V view) {
+    public static <V extends View> ScrollingAppBarLayoutBehavior from(V view) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof CoordinatorLayout.LayoutParams)) {
             throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
@@ -130,7 +130,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
                 .getBehavior();
         if (!(behavior instanceof BottomSheetBehavior)) {
             throw new IllegalArgumentException(
-                    "The view is not associated with BottomSheetBehavior");
+                    "The view is not associated with ScrollingAppBarLayoutBehavior");
         }
         return (ScrollingAppBarLayoutBehavior) behavior;
     }
