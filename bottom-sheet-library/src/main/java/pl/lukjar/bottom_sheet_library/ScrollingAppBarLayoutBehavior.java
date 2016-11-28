@@ -9,9 +9,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 
 public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 
@@ -19,21 +19,25 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     private Context context;
     private boolean isVisible = true;
 
-    private int mPeekHeight;
+    private int peekHeight;
+    private View dependentView;
 
-    private ValueAnimator mAppBarYValueAnimator;
+    private ValueAnimator appBarYValueAnimator;
 
     public ScrollingAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollingAppBarLayoutBehavior_Params);
-        setPeekHeight(a.getDimensionPixelSize(R.styleable.ScrollingAppBarLayoutBehavior_Params_behavior_scrolling_appbar_peek_height, 0));
+        TypedArray a = context.obtainStyledAttributes(attrs,
+                pl.lukjar.bottom_sheet_library.R.styleable.ScrollingAppBarLayoutBehavior_Params);
+        setPeekHeight(a.getDimensionPixelSize(
+                pl.lukjar.bottom_sheet_library.R.styleable
+                        .ScrollingAppBarLayoutBehavior_Params_behavior_scrolling_appbar_peek_height, 0));
         a.recycle();
     }
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        return dependency instanceof NestedScrollView;
+        return dependency instanceof BottomSheetView;
     }
 
     @Override
@@ -43,8 +47,8 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             return false;
         }
 
-        setAppBarVisible((AppBarLayout) child, dependency.getY() >= dependency.getHeight() - mPeekHeight);
-        return false;
+        setAppBarVisible((AppBarLayout) child, dependentView, dependency.getY() >= dependency.getHeight() - peekHeight);
+        return true;
     }
 
     @Override
@@ -60,40 +64,50 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     }
 
     private void init(View child) {
-        if (!isVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
+        if (!isVisible) {
+            child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
+        }
         isInit = true;
     }
 
     public void setPeekHeight(int peekHeight) {
-        this.mPeekHeight = peekHeight;
+        this.peekHeight = peekHeight;
     }
 
-    public void setAppBarVisible(final AppBarLayout appBarLayout, final boolean visible) {
-        if (visible == this.isVisible)
+    public void setScrollingDependentView(View dependentView) {
+        this.dependentView = dependentView;
+    }
+
+    public void setAppBarVisible(final AppBarLayout appBarLayout, View dependentView, final boolean visible) {
+        if (visible == this.isVisible) {
             return;
+        }
 
-        if (mAppBarYValueAnimator == null || !mAppBarYValueAnimator.isRunning()) {
+        if (appBarYValueAnimator == null || !appBarYValueAnimator.isRunning()) {
 
-            mAppBarYValueAnimator = ValueAnimator.ofFloat(
+            appBarYValueAnimator = ValueAnimator.ofFloat(
                     (int) appBarLayout.getY(),
-                    visible ? (int) appBarLayout.getY() + appBarLayout.getHeight() + getStatusBarHeight() :
-                            (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
-            mAppBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            mAppBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    visible ? (int) appBarLayout.getY() + appBarLayout.getHeight() + getStatusBarHeight()
+                            : (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
+            appBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
+            appBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
                     appBarLayout.setY((Float) animation.getAnimatedValue());
-
+                    if (dependentView != null) {
+                        dependentView.setTranslationY((Float) animation.getAnimatedValue());
+                    }
                 }
             });
-            mAppBarYValueAnimator.addListener(new AnimatorListenerAdapter() {
+            appBarYValueAnimator.addListener(new AnimatorListenerAdapter() {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
+
                     ScrollingAppBarLayoutBehavior.this.isVisible = visible;
                 }
             });
-            mAppBarYValueAnimator.start();
+            appBarYValueAnimator.start();
         }
     }
 
@@ -104,6 +118,21 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <V extends View> ScrollingAppBarLayoutBehavior from(V view) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (!(params instanceof CoordinatorLayout.LayoutParams)) {
+            throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
+        }
+        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
+                .getBehavior();
+        if (!(behavior instanceof BottomSheetBehavior)) {
+            throw new IllegalArgumentException(
+                    "The view is not associated with BottomSheetBehavior");
+        }
+        return (ScrollingAppBarLayoutBehavior) behavior;
     }
 
     protected static class SavedState extends View.BaseSavedState {
