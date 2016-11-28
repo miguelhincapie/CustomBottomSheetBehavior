@@ -128,7 +128,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         }
         CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
                 .getBehavior();
-        if (!(behavior instanceof BottomSheetBehavior)) {
+        if (!(behavior instanceof ScrollingAppBarLayoutBehavior)) {
             throw new IllegalArgumentException(
                     "The view is not associated with ScrollingAppBarLayoutBehavior");
         }
