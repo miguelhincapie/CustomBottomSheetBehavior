@@ -41,7 +41,7 @@
                 android:layout_height="?attr/actionBarSize" />
         </android.support.design.widget.AppBarLayout>
 
-        <pl.lukjar.bottom_sheet_library.BottomSheetView
+        <com.github.ljarka.filterbottomsheet.BottomSheetView
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -54,9 +54,9 @@
                 layout="@layout/bottom_sheet_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-        </pl.lukjar.bottom_sheet_library.BottomSheetView>
+        </com.github.ljarka.filterbottomsheet.BottomSheetView>
 
-        <pl.lukjar.bottom_sheet_library.MergedAppBarLayout
+        <com.github.ljarka.filterbottomsheet.MergedAppBarLayout
             android:id="@+id/merged_appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">bottom-sheet-library</string>
     <string name="key_binding_default_toolbar_name">Modal-Toolbar-Title</string>
-    <string name="ThreePhasesBottomSheetBehavior">pl.lukjar.bottom_sheet_library.BottomSheetBehavior</string>
-    <string name="MergedAppBarLayoutBehavior">pl.lukjar.bottom_sheet_library.MergedAppBarLayoutBehavior</string>
-    <string name="ScrollingAppBarLayoutBehavior">pl.lukjar.bottom_sheet_library.ScrollingAppBarLayoutBehavior</string>
-    <string name="FadeInBehavior">pl.lukjar.bottom_sheet_library.FadeInBehavior</string>
-    <string name="ShowResultButtonBehavior">pl.lukjar.bottom_sheet_library.ShowResultButtonBehavior</string>
+    <string name="ThreePhasesBottomSheetBehavior">com.github.ljarka.filterbottomsheet.BottomSheetBehavior</string>
+    <string name="MergedAppBarLayoutBehavior">com.github.ljarka.filterbottomsheet.MergedAppBarLayoutBehavior</string>
+    <string name="ScrollingAppBarLayoutBehavior">com.github.ljarka.filterbottomsheet.ScrollingAppBarLayoutBehavior</string>
+    <string name="FadeInBehavior">com.github.ljarka.filterbottomsheet.FadeInBehavior</string>
+    <string name="ShowResultButtonBehavior">com.github.ljarka.filterbottomsheet.ShowResultButtonBehavior</string>
 </resources>
