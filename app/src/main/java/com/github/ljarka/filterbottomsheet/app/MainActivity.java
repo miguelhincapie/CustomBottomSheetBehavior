@@ -4,12 +4,15 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.widget.RadioGroup;
 
+import com.github.ljarka.filterbottomsheet.AppBarPositionTranslator;
+import com.github.ljarka.filterbottomsheet.BottomSheetBehavior;
 import com.github.ljarka.filterbottomsheet.BottomSheetView;
 import com.github.ljarka.filterbottomsheet.MergedAppBarLayout;
-import com.github.ljarka.filterbottomsheet.app.R;
+import com.github.ljarka.filterbottomsheet.ScrollingAppBarLayoutBehavior;
 import com.github.ljarka.filterbottomsheet.app.databinding.ActivityMainBinding;
 
 import rx.Observable;
@@ -37,10 +40,31 @@ public class MainActivity extends AppCompatActivity {
                 bottomSheet.close();
             }
         });
+        binding.overlay.setClickable(bottomSheet.isExpanded());
 
         binding.showResultButton.setOnClickListener(view -> bottomSheet.close());
         ((RadioGroup) findViewById(R.id.radio_group))
                 .setOnCheckedChangeListener((radioGroup, i) -> simulateLongNetworkOperation());
+        initRecyclerVIew();
+        ScrollingAppBarLayoutBehavior.from(binding.appBar)
+                .setScrollingDependentView(binding.recyclerView);
+        binding.recyclerView.addOnScrollListener(new AppBarPositionTranslator(binding.appBar));
+        binding.bottomSheet.addOnBottomSheetStateChangedListener(state -> {
+            if (state == BottomSheetBehavior.STATE_COLLAPSED) {
+                if (binding.overlay.isClickable()) {
+                    binding.overlay.setClickable(false);
+                }
+                binding.progressBar.setVisibility(GONE);
+            } else if (!binding.overlay.isClickable()) {
+                binding.overlay.setClickable(true);
+            }
+        });
+    }
+
+    private void initRecyclerVIew() {
+        binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        binding.recyclerView.setAdapter(new RecyclerViewAdapter(new ImagesProvider().getImages()));
+        binding.recyclerView.setHasFixedSize(true);
     }
 
     private void simulateLongNetworkOperation() {

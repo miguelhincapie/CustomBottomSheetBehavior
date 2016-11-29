@@ -470,6 +470,10 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
         mMaxOffset = mParentHeight - peekHeight;
     }
 
+    public int getInitialPosition() {
+        return mParentHeight - mPeekHeight;
+    }
+
     /**
      * Gets the height of the bottom sheet when it is collapsed.
      *

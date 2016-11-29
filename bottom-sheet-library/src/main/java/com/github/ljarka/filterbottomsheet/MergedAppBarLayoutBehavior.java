@@ -28,11 +28,13 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private boolean isInit = false;
     private float anchorPoint;
     private boolean isVisible = false;
+    private boolean isTitleVisible = false;
+    private boolean isFullBackground = false;
     private String toolbarTitle;
     private Toolbar toolbar;
     private TextView titleTextView;
     private View.OnClickListener onNavigationClickListener;
-    private int currentTitleAlpha = 0;
+    private float currentTitleAlpha = 0;
     private OnTitleTextViewReadyListener onTitleTextViewReadyListener;
     private ObjectAnimator currentCloseIconAnimator;
 
@@ -109,7 +111,9 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return new SavedState(super.onSaveInstanceState(parent, child),
                 isVisible,
                 toolbarTitle,
-                currentTitleAlpha);
+                currentTitleAlpha,
+                isTitleVisible,
+                isFullBackground);
     }
 
     @Override
@@ -119,6 +123,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         this.isVisible = ss.mVisible;
         this.toolbarTitle = ss.mToolbarTitle;
         this.currentTitleAlpha = ss.mTitleAlpha;
+        this.isTitleVisible = ss.isTitleVisible;
+        this.isFullBackground = ss.isFullBackground;
     }
 
     private void init(@NonNull View child) {
@@ -128,7 +134,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         toolbar = (Toolbar) appBarLayout.findViewById(R.id.expanded_toolbar);
         titleTextView = findTitleTextView(toolbar);
         child.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
-        setFullBackGroundColor(isVisible && currentTitleAlpha == 1 ? R.color.colorPrimary : android.R.color.transparent);
+        setFullBackGroundColor(isFullBackground ? R.color.colorPrimary : android.R.color.transparent);
+        setTitleVisible(isTitleVisible);
         titleTextView.setText(toolbarTitle);
         titleTextView.setAlpha(currentTitleAlpha);
         isInit = true;
@@ -165,6 +172,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     private void setFullBackGroundColor(@ColorRes int colorRes) {
         toolbar.setBackgroundColor(ContextCompat.getColor(toolbar.getContext(), colorRes));
+        isFullBackground = colorRes != android.R.color.transparent;
     }
 
     private TextView findTitleTextView(Toolbar toolbar) {
@@ -205,6 +213,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             return;
 
         titleTextView.setAlpha(visible ? 1 : 0);
+        currentTitleAlpha = titleTextView.getAlpha();
+        isTitleVisible = visible;
     }
 
     public void setNavigationOnClickListener(View.OnClickListener listener) {
@@ -233,20 +243,27 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
         final boolean mVisible;
         final String mToolbarTitle;
-        final int mTitleAlpha;
+        final float mTitleAlpha;
+        final boolean isTitleVisible;
+        final boolean isFullBackground;
 
         public SavedState(Parcel source) {
             super(source);
             mVisible = source.readByte() != 0;
             mToolbarTitle = source.readString();
-            mTitleAlpha = source.readInt();
+            mTitleAlpha = source.readFloat();
+            isTitleVisible = source.readByte() == 1;
+            isFullBackground = source.readByte() == 1;
         }
 
-        public SavedState(Parcelable superState, boolean visible, String toolBarTitle, int titleAlpha) {
+        public SavedState(Parcelable superState, boolean visible, String toolBarTitle,
+                          float titleAlpha, boolean isTitleVisible, boolean isFullBackground) {
             super(superState);
             this.mVisible = visible;
             this.mToolbarTitle = toolBarTitle;
             this.mTitleAlpha = titleAlpha;
+            this.isFullBackground = isFullBackground;
+            this.isTitleVisible = isTitleVisible;
         }
 
         @Override
@@ -254,7 +271,9 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             super.writeToParcel(out, flags);
             out.writeByte((byte) (mVisible ? 1 : 0));
             out.writeString(mToolbarTitle);
-            out.writeInt(mTitleAlpha);
+            out.writeFloat(mTitleAlpha);
+            out.writeByte((byte) (isTitleVisible ? 1 : 0));
+            out.writeByte((byte) (isFullBackground ? 1 : 0));
         }
 
         public static final Creator<SavedState> CREATOR =

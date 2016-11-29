@@ -20,4 +20,8 @@
         <attr name="behavior_show_result_button_anchor_point" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="FadeInBehavior_Params">
+        <attr name="fade_in_behavior_anchor_point" format="dimension" />
+    </declare-styleable>
+
 </resources>

@@ -3,8 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/peek_height"
+            android:paddingTop="?attr/actionBarSize" />
 
         <FrameLayout
             android:id="@+id/overlay"
@@ -12,6 +21,7 @@
             android:layout_height="match_parent"
             android:alpha="0"
             android:background="@android:color/black"
+            app:fade_in_behavior_anchor_point="@dimen/anchor_point"
             app:layout_behavior="@string/FadeInBehavior" />
 
         <FrameLayout
@@ -30,6 +40,7 @@
         </FrameLayout>
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"

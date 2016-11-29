@@ -65,7 +65,10 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     private void init(View child) {
         if (!isVisible) {
-            child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
+            child.setTranslationY(-child.getHeight());
+            if (dependentView != null) {
+                dependentView.setTranslationY(-child.getHeight());
+            }
         }
         isInit = true;
     }
@@ -84,16 +87,19 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         }
 
         if (appBarYValueAnimator == null || !appBarYValueAnimator.isRunning()) {
+            int fromValue = (int) appBarLayout.getTranslationY();
+            int toValue = visible ? 0 : -appBarLayout.getHeight();
 
-            appBarYValueAnimator = ValueAnimator.ofFloat(
-                    (int) appBarLayout.getY(),
-                    visible ? (int) appBarLayout.getY() + appBarLayout.getHeight() + getStatusBarHeight()
-                            : (int) appBarLayout.getY() - appBarLayout.getHeight() - getStatusBarHeight());
+            if (toValue == appBarLayout.getTranslationY()) {
+                isVisible = visible;
+                return;
+            }
+            appBarYValueAnimator = ValueAnimator.ofFloat(fromValue, toValue);
             appBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
             appBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    appBarLayout.setY((Float) animation.getAnimatedValue());
+                    appBarLayout.setTranslationY((Float) animation.getAnimatedValue());
                     if (dependentView != null) {
                         dependentView.setTranslationY((Float) animation.getAnimatedValue());
                     }
@@ -103,7 +109,6 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-
                     ScrollingAppBarLayoutBehavior.this.isVisible = visible;
                 }
             });
