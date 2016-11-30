@@ -36,6 +36,8 @@ public class FadeInLayoutBehavior extends CoordinatorLayout.Behavior<FrameLayout
 
         if (dependency.getY() >= anchorPoint && isInit) {
             child.setAlpha(positionToAlpha(dependency.getY()));
+        } else {
+            child.setAlpha(MAX_ALPHA);
         }
         return true;
     }

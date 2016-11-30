@@ -61,6 +61,9 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
         this.isVisible = ss.isVisible;
+        if (child.getHeight() > 0) {
+            init(child);
+        }
     }
 
     private void init(View child) {
@@ -94,13 +97,16 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
                 isVisible = visible;
                 return;
             }
+
+            boolean shouldAnimateDependentView = dependentView != null && !(toValue == dependentView.getTranslationY());
+
             appBarYValueAnimator = ValueAnimator.ofFloat(fromValue, toValue);
             appBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
             appBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
                     appBarLayout.setTranslationY((Float) animation.getAnimatedValue());
-                    if (dependentView != null) {
+                    if (shouldAnimateDependentView) {
                         dependentView.setTranslationY((Float) animation.getAnimatedValue());
                     }
                 }

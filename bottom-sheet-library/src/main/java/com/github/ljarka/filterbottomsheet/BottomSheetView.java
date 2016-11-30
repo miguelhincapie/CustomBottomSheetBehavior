@@ -132,6 +132,7 @@ public class BottomSheetView extends NestedScrollView {
     public void close() {
         lazyInitLayoutBehavior();
         layoutBehavior.setState(STATE_COLLAPSED);
+        scrollTo(0, 0);
     }
 
     public void open() {
@@ -184,7 +185,7 @@ public class BottomSheetView extends NestedScrollView {
 
     public boolean isExpanded() {
         lazyInitLayoutBehavior();
-        return layoutBehavior.getState() == STATE_EXPANDED;
+        return layoutBehavior.getState() == STATE_EXPANDED || layoutBehavior.getState() == STATE_ANCHOR_POINT;
     }
 
     public void animateTextColor(float colorChangePercent) {

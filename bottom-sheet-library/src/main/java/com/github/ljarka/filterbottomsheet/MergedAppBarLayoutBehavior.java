@@ -125,23 +125,37 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         this.currentTitleAlpha = ss.mTitleAlpha;
         this.isTitleVisible = ss.isTitleVisible;
         this.isFullBackground = ss.isFullBackground;
+        init(child);
     }
 
     private void init(@NonNull View child) {
         AppBarLayout appBarLayout = (AppBarLayout) child;
         hideShadowForTransparentAppBarLayout(appBarLayout);
 
-        toolbar = (Toolbar) appBarLayout.findViewById(R.id.expanded_toolbar);
-        titleTextView = findTitleTextView(toolbar);
+        if (toolbar == null) {
+            toolbar = (Toolbar) appBarLayout.findViewById(R.id.expanded_toolbar);
+        }
+
+        if (onNavigationClickListener != null) {
+            toolbar.setNavigationOnClickListener(onNavigationClickListener);
+        }
+
+        if (titleTextView == null) {
+            titleTextView = findTitleTextView(toolbar);
+            if (onTitleTextViewReadyListener != null) {
+                if (titleTextView.getHeight() > 0) {
+                    onTitleTextViewReadyListener.onTitleTextViewReady(titleTextView);
+                } else {
+                    titleTextView.post(() -> onTitleTextViewReadyListener.onTitleTextViewReady(titleTextView));
+                }
+            }
+        }
         child.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
         setFullBackGroundColor(isFullBackground ? R.color.colorPrimary : android.R.color.transparent);
         setTitleVisible(isTitleVisible);
         titleTextView.setText(toolbarTitle);
         titleTextView.setAlpha(currentTitleAlpha);
         isInit = true;
-        if (onTitleTextViewReadyListener != null) {
-            onTitleTextViewReadyListener.onTitleTextViewReady(titleTextView);
-        }
     }
 
     private void hideShadowForTransparentAppBarLayout(AppBarLayout appBarLayout) {

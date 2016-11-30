@@ -61,6 +61,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (binding.bottomSheet.isExpanded()) {
+            binding.bottomSheet.close();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void initRecyclerVIew() {
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         binding.recyclerView.setAdapter(new RecyclerViewAdapter(new ImagesProvider().getImages()));
@@ -82,6 +91,4 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setTitle(" ");
         }
     }
-
-
 }
