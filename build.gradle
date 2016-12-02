@@ -12,6 +12,8 @@ buildscript {
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.3.4'
+    id 'com.jfrog.bintray' version '1.7'
+    id 'maven-publish'
 }
 
 allprojects {
@@ -20,6 +22,7 @@ allprojects {
         mavenCentral()
     }
 
+    project.group = 'com.github.ljarka'
     project.version = scmVersion.version
 }
 

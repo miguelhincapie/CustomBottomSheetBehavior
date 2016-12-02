@@ -1,0 +1,17 @@
+language: android
+jdk: oraclejdk8
+sudo: false
+android:
+  components:
+  - android-23
+  - build-tools-23.0.0
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+script:
+- "./gradlew build"
+deploy:
+  provider: script
+  script: "./gradlew bintrayUpload"
+  on:
+    tags: true
