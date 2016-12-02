@@ -3,8 +3,12 @@ jdk: oraclejdk8
 sudo: false
 android:
   components:
-  - android-23
-  - build-tools-23.0.0
+    - android-23
+    - build-tools-23.0.0
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 cache:
   directories:
   - "$HOME/.gradle/caches/"
