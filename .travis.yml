@@ -3,13 +3,12 @@ jdk: oraclejdk8
 sudo: false
 android:
   components:
-    - tools
-    - platform-tools
-    - tools
-    - build-tools-25.0.1
-    - android-25
-    - extra-google-m2repository
-    - extra-android-m2repository
+     - tools
+     - platform-tools
+     - build-tools-23.0.3
+     - android-23
+     - extra-google-m2repository
+     - extra-android-m2repository
 cache:
   directories:
   - "$HOME/.gradle/caches/"
