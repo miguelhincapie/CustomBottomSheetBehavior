@@ -3,13 +3,13 @@ jdk: oraclejdk8
 sudo: false
 android:
   components:
-   - tools
-   - platform-tools
-   - tools
-   - build-tools-25.0.1
-   - android-25
-   - extra-google-m2repository
-   - extra-android-m2repository
+  - tools
+  - platform-tools
+  - tools
+  - build-tools-25.0.1
+  - android-25
+  - extra-google-m2repository
+  - extra-android-m2repository
 cache:
   directories:
   - "$HOME/.gradle/caches/"
@@ -22,4 +22,4 @@ deploy:
     tags: true
 env:
   global:
-    secure: "b3o1H56Kya5DPmz4zQXdyWKgHnskOHjyjq2EOowcOTo9XDk7FV8pViQRAC1ZGqC8V+D9BS8QApyzH9LxQI7W7IwQt0C8ECTEC4YmiqfFIojpfLBsvmhkCoSDVNOELKcffQVd/MCEKGk93ClwxPb2pxt2m/ZJ3qYuixRCoF9GOKA14ck7Ay5wE8dGqTggefUrpK3XQJjutiQmUlLKuYqV1JJDRAM+UkylomPSXyJZN3W/by/GK20RmjZ90j2vuIyyAlaEOF6yyFyzH1CtG5H1NuDR38HlOySUxzgUg1x/4+ynOhmSeHUh6Oct8BAGPdksUF/GmygL/tXlCjQPmfHwBjyKJQqaM+KT3rgN1rTovpuU/lKwkD8FlUokQOVdV0rvMDFLdo/LJ1iRkki6gZTuMFKROPmhBmlbJm9N0NpSDhkhhUNzfiFU/WcCkSD5nYhlEdOmLBpvlj4OOdk8pwCtqo67O+sJlNgoqjAZW1F8pweN+vvHFD7052zRtHF9EUyxfnlyZ5tjv1M7KmbUBHuH3cMU9MX8oWnKuXL+qLRZpgvmovxJbfMefpXuhC9hKsTQuvFp1FOaevTTp78ICg2JD/CSHoBizefGJm6juCzGQ3PfCnj1ImqCIxd4gqCaa2DS6AOVkENGBdfgfqnhs5Kx87Gsh+sUHLw9yUYZ6Z6YppA="
+  - secure: AqBZ/TgEuQoftJeD7OD+T1By9z16MZnxGsCmunTtfav6rutly4eZ+kU0nldMlKZ7EJBiCxPSBbZDREjGtbeCeph3ieN30Z97zsoCNNUisZT1F6M3jqi6a+1YhJA62CpxJkDfs7dt8TaQKiBQP0ABPi0mlYiYvqoFzYzGfFbJCI0GmtEOcuGKcHW56kOEBpZDJzfCG4dTyNq98Ayi1ZgO3AgBV4Mb47y6lsK6Hb4WhaiI6hncK1O7xJoC3/tpjHZiB1MjZSOc4HLl0zedf38F04RETVzVzamy1isqkoKnyhalXnTrU/Uw05G34j4j+cntleQQ6QASm2f8rg8NJ0NEFUlCRGLIYp+LlnqVO8DdQJYvR/G2gVUAFRS6v98kgU7RkqigbaNC3dYLadecXtGMZh7MaJeKINjJ2xiQkV992JJNIaANYL+TapYEzO8zSLC0YX1VtcUcckuA0cmaKY0hWPex3ziEiQqPOsG0izke/2MG0u7Szl5//Jimx6EWdTGg0jeiiXalMysL+FQ1FZp8AxB9hoLhHnJeqaxBaEV0rOvbsi5p/Tf91XkRvW1ne6KKQpzqb6M4o6RHY6zlISORhsRLYV2AqYfWr62SEHwvQnkp26d9ujIsq1slvQtaSZABDmGKe3Pzujq9DigGxV4gSgnB/kZej6MFoogDsJrZiCo=
