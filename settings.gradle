@@ -1,1 +1,3 @@
 include ':app', ':bottom-sheet-library'
+
+rootProject.name = 'library'

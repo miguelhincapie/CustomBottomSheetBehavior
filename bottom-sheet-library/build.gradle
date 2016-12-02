@@ -1,11 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'me.tatarka.retrolambda'
-group = 'com.github.ljarka'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         minSdkVersion 16
@@ -46,4 +45,32 @@ task androidSourcesJar(type: Jar) {
 
 artifacts {
     archives androidSourcesJar
+}
+
+publishing {
+    publications {
+        library(MavenPublication) {
+            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+            artifact androidSourcesJar
+        }
+    }
+}
+
+bintray {
+    def credentials = (project.hasProperty('bintray.credentials') ?
+            project.property('bintray.credentials') : System.getenv('BINTRAY_CREDENTIALS') ?: '').split(
+            ':')
+    user = credentials.first()
+    key = credentials.last()
+    publications = ['library']
+    pkg {
+        repo = 'maven'
+        name = "$project.group:$project.name"
+        userOrg = 'ljarka'
+        version {
+            gpg {
+                sign = true
+            }
+        }
+    }
 }
