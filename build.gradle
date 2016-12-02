@@ -22,7 +22,7 @@ allprojects {
         mavenCentral()
     }
 
-    project.group = 'com.github.ljarka'
+    project.group = 'com.github.ljarka.filterbottomsheet'
     project.version = scmVersion.version
 }
 

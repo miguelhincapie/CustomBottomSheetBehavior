@@ -50,7 +50,7 @@ artifacts {
 publishing {
     publications {
         aar(MavenPublication) {
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            artifact("$buildDir/outputs/aar/${rootProject.name}-release.aar")
             artifact androidSourcesJar
         }
     }
