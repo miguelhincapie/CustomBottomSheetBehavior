@@ -1,0 +1,25 @@
+language: android
+jdk: oraclejdk8
+sudo: false
+android:
+  components:
+  - tools
+  - platform-tools
+  - tools
+  - build-tools-25.0.1
+  - android-25
+  - extra-google-m2repository
+  - extra-android-m2repository
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+script:
+- "./gradlew build"
+deploy:
+  provider: script
+  script: "./gradlew bintrayUpload"
+  on:
+    tags: true
+env:
+  global:
+  - secure: AqBZ/TgEuQoftJeD7OD+T1By9z16MZnxGsCmunTtfav6rutly4eZ+kU0nldMlKZ7EJBiCxPSBbZDREjGtbeCeph3ieN30Z97zsoCNNUisZT1F6M3jqi6a+1YhJA62CpxJkDfs7dt8TaQKiBQP0ABPi0mlYiYvqoFzYzGfFbJCI0GmtEOcuGKcHW56kOEBpZDJzfCG4dTyNq98Ayi1ZgO3AgBV4Mb47y6lsK6Hb4WhaiI6hncK1O7xJoC3/tpjHZiB1MjZSOc4HLl0zedf38F04RETVzVzamy1isqkoKnyhalXnTrU/Uw05G34j4j+cntleQQ6QASm2f8rg8NJ0NEFUlCRGLIYp+LlnqVO8DdQJYvR/G2gVUAFRS6v98kgU7RkqigbaNC3dYLadecXtGMZh7MaJeKINjJ2xiQkV992JJNIaANYL+TapYEzO8zSLC0YX1VtcUcckuA0cmaKY0hWPex3ziEiQqPOsG0izke/2MG0u7Szl5//Jimx6EWdTGg0jeiiXalMysL+FQ1FZp8AxB9hoLhHnJeqaxBaEV0rOvbsi5p/Tf91XkRvW1ne6KKQpzqb6M4o6RHY6zlISORhsRLYV2AqYfWr62SEHwvQnkp26d9ujIsq1slvQtaSZABDmGKe3Pzujq9DigGxV4gSgnB/kZej6MFoogDsJrZiCo=
