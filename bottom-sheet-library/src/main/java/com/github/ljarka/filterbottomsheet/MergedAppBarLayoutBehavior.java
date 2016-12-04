@@ -1,7 +1,5 @@
 package com.github.ljarka.filterbottomsheet;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -28,15 +26,12 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private boolean isInit = false;
     private float anchorPoint;
     private boolean isVisible = false;
-    private boolean isTitleVisible = false;
     private boolean isFullBackground = false;
     private String toolbarTitle;
     private Toolbar toolbar;
     private TextView titleTextView;
     private View.OnClickListener onNavigationClickListener;
-    private float currentTitleAlpha = 0;
     private OnTitleTextViewReadyListener onTitleTextViewReadyListener;
-    private ObjectAnimator currentCloseIconAnimator;
 
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -62,34 +57,12 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         } else if (isDependencyYBetweenAnchorPointAndToolbar(child, dependency)) {
             showOnlyCloseIconWithTransparentBackground(child);
         } else if (isDependencyYBelowToolbar(child, dependency) && !isDependencyYReachTop(dependency)) {
-            setTitleVisible(false);
             setFullBackGroundColor(android.R.color.transparent);
-        } else if (isDependencyYBelowStatusToolbar(child, dependency) || isDependencyYReachTop(dependency)) {
-            showToolbarWithTitleAndColor();
         }
         return true;
     }
 
-    private void showToolbarWithTitleAndColor() {
-        if (currentCloseIconAnimator != null && currentCloseIconAnimator.isRunning()) {
-            waitForFinishingCloseIconAnimationAndShowTitle();
-        } else {
-            setTitleVisible(true);
-        }
-    }
-
-    private void waitForFinishingCloseIconAnimationAndShowTitle() {
-        currentCloseIconAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                setTitleVisible(true);
-                currentCloseIconAnimator.removeListener(this);
-            }
-        });
-    }
-
     private void showOnlyCloseIconWithTransparentBackground(View child) {
-        setTitleVisible(false);
         if (!isVisible) {
             showCloseButtonWithTranslateAnimation(child);
         }
@@ -98,7 +71,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     }
 
     private void showCloseButtonWithTranslateAnimation(View child) {
-        currentCloseIconAnimator = ObjectAnimator.ofFloat(child, View.TRANSLATION_Y, -child.getHeight(), 0);
+        ObjectAnimator currentCloseIconAnimator = ObjectAnimator.ofFloat(child, View.TRANSLATION_Y, -child.getHeight(), 0);
         currentCloseIconAnimator.setDuration(200);
         currentCloseIconAnimator.setInterpolator(new DecelerateInterpolator());
         currentCloseIconAnimator.start();
@@ -109,8 +82,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return new SavedState(super.onSaveInstanceState(parent, child),
                 isVisible,
                 toolbarTitle,
-                currentTitleAlpha,
-                isTitleVisible,
                 isFullBackground);
     }
 
@@ -120,8 +91,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
         this.isVisible = ss.mVisible;
         this.toolbarTitle = ss.mToolbarTitle;
-        this.currentTitleAlpha = ss.mTitleAlpha;
-        this.isTitleVisible = ss.isTitleVisible;
         this.isFullBackground = ss.isFullBackground;
         init(child);
     }
@@ -150,9 +119,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         }
         child.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
         setFullBackGroundColor(isFullBackground ? R.color.colorPrimary : android.R.color.transparent);
-        setTitleVisible(isTitleVisible);
+        titleTextView.setAlpha(0);
         titleTextView.setText(toolbarTitle);
-        titleTextView.setAlpha(currentTitleAlpha);
         isInit = true;
     }
 
@@ -172,10 +140,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     private boolean isDependencyYBelowToolbar(@NonNull View child, @NonNull View dependency) {
         return dependency.getY() <= child.getY() + child.getHeight() && dependency.getY() > child.getY();
-    }
-
-    private boolean isDependencyYBelowStatusToolbar(@NonNull View child, @NonNull View dependency) {
-        return dependency.getY() <= child.getY();
     }
 
     private boolean isDependencyYReachTop(@NonNull View dependency) {
@@ -218,17 +182,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         }
     }
 
-    private void setTitleVisible(boolean visible) {
-
-        if ((visible && titleTextView.getAlpha() == 1) ||
-                (!visible && titleTextView.getAlpha() == 0))
-            return;
-
-        titleTextView.setAlpha(visible ? 1 : 0);
-        currentTitleAlpha = titleTextView.getAlpha();
-        isTitleVisible = visible;
-    }
-
     public void setNavigationOnClickListener(View.OnClickListener listener) {
         this.onNavigationClickListener = listener;
     }
@@ -237,10 +190,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         this.toolbarTitle = title;
         if (this.toolbar != null)
             this.toolbar.setTitle(title);
-    }
-
-    public TextView getTitleTextView() {
-        return titleTextView;
     }
 
     public void setAnchorPoint(float anchorPoint) {
@@ -255,27 +204,20 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
         final boolean mVisible;
         final String mToolbarTitle;
-        final float mTitleAlpha;
-        final boolean isTitleVisible;
         final boolean isFullBackground;
 
         public SavedState(Parcel source) {
             super(source);
             mVisible = source.readByte() != 0;
             mToolbarTitle = source.readString();
-            mTitleAlpha = source.readFloat();
-            isTitleVisible = source.readByte() == 1;
             isFullBackground = source.readByte() == 1;
         }
 
-        public SavedState(Parcelable superState, boolean visible, String toolBarTitle,
-                          float titleAlpha, boolean isTitleVisible, boolean isFullBackground) {
+        public SavedState(Parcelable superState, boolean visible, String toolBarTitle, boolean isFullBackground) {
             super(superState);
             this.mVisible = visible;
             this.mToolbarTitle = toolBarTitle;
-            this.mTitleAlpha = titleAlpha;
             this.isFullBackground = isFullBackground;
-            this.isTitleVisible = isTitleVisible;
         }
 
         @Override
@@ -283,8 +225,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             super.writeToParcel(out, flags);
             out.writeByte((byte) (mVisible ? 1 : 0));
             out.writeString(mToolbarTitle);
-            out.writeFloat(mTitleAlpha);
-            out.writeByte((byte) (isTitleVisible ? 1 : 0));
             out.writeByte((byte) (isFullBackground ? 1 : 0));
         }
 
