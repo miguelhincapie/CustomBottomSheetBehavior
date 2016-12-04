@@ -14,9 +14,11 @@ import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.ljarka.filterbottomsheet.BottomSheetBehavior.STATE_ANCHOR_POINT;
 import static com.github.ljarka.filterbottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.github.ljarka.filterbottomsheet.BottomSheetBehavior.STATE_EXPANDED;
@@ -33,9 +35,10 @@ public class BottomSheetView extends NestedScrollView {
 
     private static final int MAX_PERCENT = 100;
     private static final int MAX_HEX = 255;
-    private LinearLayout bottomSheetContainer;
+    private RelativeLayout bottomSheetContainer;
     private TextView bottomSheetTitle;
     private ViewGroup titleContainer;
+    private View titleBackground;
     private BottomSheetBehavior layoutBehavior;
     private int bottomSheetTitleBackgroundColor;
     private int maxHorizontalTextTranslation = -1;
@@ -58,12 +61,13 @@ public class BottomSheetView extends NestedScrollView {
 
     private void init(Context context) {
         inflate(context, R.layout.bottom_sheet_layout, this);
-        bottomSheetContainer = (LinearLayout) findViewById(R.id.bottom_sheet_container);
+        bottomSheetContainer = (RelativeLayout) findViewById(R.id.bottom_sheet_container);
         bottomSheetTitle = (TextView) findViewById(R.id.bottom_sheet_title);
         titleContainer = (ViewGroup) findViewById(R.id.title_container);
+        titleBackground = findViewById(R.id.title_background);
         bottomSheetTitleBackgroundColor = ContextCompat.getColor(context,
                 R.color.bottomSheetTitleBackground);
-        titleContainer.setBackgroundColor(bottomSheetTitleBackgroundColor);
+        titleBackground.setBackgroundColor(bottomSheetTitleBackgroundColor);
         bottomSheetTitle.setTextColor(Color.WHITE);
         titleContainer.setOnClickListener(v -> onTitleContainerClick());
     }
@@ -79,7 +83,11 @@ public class BottomSheetView extends NestedScrollView {
 
     @Override
     public void addView(View child) {
-        bottomSheetContainer.addView(child);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(MATCH_PARENT,
+                WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.BELOW, R.id.title_container);
+        bottomSheetContainer.addView(child, layoutParams);
+        titleContainer.bringToFront();
     }
 
     @Override
@@ -87,7 +95,10 @@ public class BottomSheetView extends NestedScrollView {
         if (bottomSheetContainer == null) {
             super.addView(child, params);
         } else {
-            bottomSheetContainer.addView(child, params);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(params.width,
+                    params.height);
+            layoutParams.addRule(RelativeLayout.BELOW, R.id.title_container);
+            bottomSheetContainer.addView(child, layoutParams);
         }
     }
 
@@ -119,11 +130,13 @@ public class BottomSheetView extends NestedScrollView {
     }
 
     public void defaultBehaviorConnectionWith(MergedAppBarLayout mergedAppBarLayout) {
+        lazyInitLayoutBehavior();
         mergedAppBarLayout.setToolbarTitle(bottomSheetTitle.getText().toString());
         mergedAppBarLayout.setTitleTextViewReadyListener(titleTextView -> {
             setAppBarTextLeftDistance(titleTextView.getLeft());
             setAppBarTextTopDistance(titleTextView.getTop());
             setAppBarTextSize(titleTextView.getTextSize());
+            layoutBehavior.onBottomSheetConnectionValuesReady(BottomSheetView.this);
         });
 
         mergedAppBarLayout.setNavigationOnClickListener(v -> close());
@@ -178,7 +191,7 @@ public class BottomSheetView extends NestedScrollView {
     }
 
     public void animateBackgroundColor(float alphaInPercent) {
-        titleContainer.setBackgroundColor(ColorUtils
+        titleBackground.setBackgroundColor(ColorUtils
                 .setAlphaComponent(bottomSheetTitleBackgroundColor,
                         convertPercentToHex(alphaInPercent)));
     }
@@ -216,6 +229,32 @@ public class BottomSheetView extends NestedScrollView {
     }
 
     @Override
+    protected void onScrollChanged(int l, int verticalScroll, int oldl, int oldt) {
+        super.onScrollChanged(l, verticalScroll, oldl, oldt);
+        controlButton(verticalScroll);
+    }
+
+    private void controlButton(int scrolLY) {
+        int scrollRange = getScrollRange();
+
+        if (scrolLY <= 0) {
+            titleContainer.setY(0);
+        } else {
+            titleContainer.setY(scrolLY >= scrollRange ? scrollRange : scrolLY);
+        }
+    }
+
+    public int getScrollRange() {
+        int scrollRange = 0;
+        if (getChildCount() > 0) {
+            View child = getChildAt(0);
+            scrollRange = Math.max(0,
+                    child.getHeight() - (getHeight() - getPaddingBottom() - getPaddingTop()));
+        }
+        return scrollRange;
+    }
+
+    @Override
     protected Parcelable onSaveInstanceState() {
         lazyInitLayoutBehavior();
         Bundle state = new Bundle();
@@ -233,6 +272,10 @@ public class BottomSheetView extends NestedScrollView {
         @BottomSheetBehavior.State
         int bottomSheetState = viewInstanceState.getViewState().getInt(BOTTOM_SHEET_STATE);
         layoutBehavior.setState(bottomSheetState);
+    }
+
+    public View getTitleContainer() {
+        return titleContainer;
     }
 
     @SuppressWarnings("unchecked")

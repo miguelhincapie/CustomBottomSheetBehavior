@@ -14,7 +14,7 @@
             android:layout_gravity="bottom"
             android:background="@android:color/white" />
 
-        <android.support.v7.widget.Toolbar
+        <com.github.ljarka.filterbottomsheet.UntouchableToolbar
             android:id="@+id/expanded_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"

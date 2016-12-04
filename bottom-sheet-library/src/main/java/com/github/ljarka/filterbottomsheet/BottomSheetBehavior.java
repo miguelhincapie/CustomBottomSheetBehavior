@@ -65,6 +65,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
          *                    when it is moving upward, and from 0 to -1 when it moving downward.
          */
         public abstract void onSlide(@NonNull View bottomSheet, float slideOffset);
+
     }
 
     /**
@@ -103,6 +104,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     @IntDef({STATE_EXPANDED, STATE_COLLAPSED, STATE_DRAGGING, STATE_ANCHOR_POINT, STATE_SETTLING, STATE_HIDDEN})
     @Retention(RetentionPolicy.SOURCE)
     public @interface State {
+
     }
 
     private static final float HIDE_THRESHOLD = 0.5f;
@@ -118,8 +120,8 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     private int mMaxOffset;
 
     private static final int DEFAULT_ANCHOR_POINT = 700;
-    public int mAnchorPoint;
 
+    public int mAnchorPoint;
     private boolean mHideable;
 
     @State
@@ -149,6 +151,11 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
 
     private boolean mTouchingScrollingChild;
 
+    private float lastTouchY = Float.MAX_VALUE;
+    private boolean isMovingDown = false;
+    private boolean isTouchingButton = false;
+    private boolean enableInternalScrollingInAnchorPointState;
+
     /**
      * Default constructor for instantiating BottomSheetBehaviors.
      */
@@ -175,8 +182,11 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
          */
         mAnchorPoint = DEFAULT_ANCHOR_POINT;
         a = context.obtainStyledAttributes(attrs, R.styleable.CustomBottomSheetBehavior);
-        if (attrs != null)
+        if (attrs != null) {
             mAnchorPoint = (int) a.getDimension(R.styleable.CustomBottomSheetBehavior_anchorPoint, 0);
+            enableInternalScrollingInAnchorPointState = a.getBoolean(R.styleable.CustomBottomSheetBehavior_enableInternalScrollingInAnchorPointState, false);
+        }
+
         a.recycle();
 
 
@@ -235,10 +245,20 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
 
     @Override
     public boolean onInterceptTouchEvent(CoordinatorLayout parent, BottomSheetView child, MotionEvent event) {
+        isTouchingButton = event.getY() > child.getTop() && event.getY() < child.getTop() + child.getTitleContainer().getHeight();
+        int action = MotionEventCompat.getActionMasked(event);
+
+        if (action == MotionEvent.ACTION_MOVE) {
+            isMovingDown = lastTouchY < event.getY();
+        }
+
+        if (action == MotionEvent.ACTION_DOWN) {
+            lastTouchY = event.getY();
+        }
+
         if (!child.isShown()) {
             return false;
         }
-        int action = MotionEventCompat.getActionMasked(event);
         // Record the velocity
         if (action == MotionEvent.ACTION_DOWN) {
             reset();
@@ -327,6 +347,12 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, BottomSheetView child, View target, int dx,
                                   int dy, int[] consumed) {
+        if (enableInternalScrollingInAnchorPointState) {
+            if (!isTouchingButton && child.getScrollY() != child.getScrollRange()
+                    && !(child.getScrollY() == 0 && isMovingDown)) {
+                return;
+            }
+        }
         View scrollingChild = mNestedScrollingChildRef.get();
         if (target != scrollingChild) {
             return;
@@ -634,6 +660,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     }
 
     private class CustomDragHelperCallback extends ViewDragHelper.Callback {
+
         private BottomSheetView bottomSheetView;
 
         public CustomDragHelperCallback(BottomSheetView bottomSheetView) {
@@ -724,6 +751,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
                 return mMaxOffset - mMinOffset;
             }
         }
+
     }
 
     private void dispatchOnSlide(int top, BottomSheetView bottomSheetView) {
@@ -737,6 +765,10 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
                         (float) (mMaxOffset - top) / ((mMaxOffset - mMinOffset)));
             }
         }
+    }
+
+    public void onBottomSheetConnectionValuesReady(BottomSheetView bottomSheetView) {
+        animateTitle(bottomSheetView, bottomSheetView.getTop());
     }
 
     private class SettleRunnable implements Runnable {

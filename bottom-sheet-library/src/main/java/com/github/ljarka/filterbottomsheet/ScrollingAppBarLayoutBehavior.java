@@ -31,7 +31,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
                 R.styleable.ScrollingAppBarLayoutBehavior_Params);
         setPeekHeight(a.getDimensionPixelSize(
                 R.styleable
-                        .ScrollingAppBarLayoutBehavior_Params_behavior_scrolling_appbar_peek_height, 0));
+                        .ScrollingAppBarLayoutBehavior_Params_behaviorScrollingAppbarPeekHeight, 0));
         a.recycle();
     }
 

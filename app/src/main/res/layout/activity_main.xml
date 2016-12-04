@@ -21,7 +21,7 @@
             android:layout_height="match_parent"
             android:alpha="0"
             android:background="@android:color/black"
-            app:fade_in_behavior_anchor_point="@dimen/anchor_point"
+            app:fadeInBehaviorAnchorPoint="@dimen/anchor_point"
             app:layout_behavior="@string/FadeInBehavior" />
 
         <FrameLayout
@@ -43,7 +43,7 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:behavior_scrolling_appbar_peek_height="@dimen/bottom_sheet_peek_height"
+            app:behaviorScrollingAppbarPeekHeight="@dimen/bottom_sheet_peek_height"
             app:layout_behavior="@string/ScrollingAppBarLayoutBehavior">
 
             <android.support.v7.widget.Toolbar
@@ -58,6 +58,7 @@
             android:layout_height="match_parent"
             app:anchorPoint="@dimen/anchor_point"
             app:behavior_peekHeight="@dimen/peek_height"
+            app:enableInternalScrollingInAnchorPointState="true"
             app:layout_behavior="@string/ThreePhasesBottomSheetBehavior">
 
             <include
@@ -72,7 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            app:behavior_merged_appbar_anchor_point="@dimen/anchor_point"
+            app:behaviorMergedAppbarAnchorPoint="@dimen/anchor_point"
             app:layout_behavior="@string/MergedAppBarLayoutBehavior" />
 
         <LinearLayout
@@ -83,7 +84,7 @@
             android:clickable="true"
             android:foreground="?attr/selectableItemBackground"
             android:orientation="vertical"
-            app:behavior_show_result_button_anchor_point="@dimen/anchor_point"
+            app:behaviorShowResultButtonAnchorPoint="@dimen/anchor_point"
             app:layout_behavior="@string/ShowResultButtonBehavior">
 
             <View

@@ -14,7 +14,7 @@ public class ShowResultButtonBehavior extends CoordinatorLayout.Behavior<View> {
     public ShowResultButtonBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ShowResultsButtonLayoutBehavior_Params);
-        anchorPoint = typedArray.getDimensionPixelSize(R.styleable.ShowResultsButtonLayoutBehavior_Params_behavior_show_result_button_anchor_point, 0);
+        anchorPoint = typedArray.getDimensionPixelSize(R.styleable.ShowResultsButtonLayoutBehavior_Params_behaviorShowResultButtonAnchorPoint, 0);
         typedArray.recycle();
     }
 

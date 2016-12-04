@@ -17,7 +17,7 @@ public class FadeInLayoutBehavior extends CoordinatorLayout.Behavior<FrameLayout
     public FadeInLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FadeInBehavior_Params);
-        anchorPoint = typedArray.getDimensionPixelSize(R.styleable.FadeInBehavior_Params_fade_in_behavior_anchor_point, 0);
+        anchorPoint = typedArray.getDimensionPixelSize(R.styleable.FadeInBehavior_Params_fadeInBehaviorAnchorPoint, 0);
         typedArray.recycle();
     }
 

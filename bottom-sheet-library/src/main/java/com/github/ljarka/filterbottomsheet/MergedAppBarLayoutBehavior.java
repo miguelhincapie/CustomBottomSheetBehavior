@@ -41,7 +41,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MergedAppBarLayoutBehavior_Params);
-        setAnchorPoint(typedArray.getDimensionPixelSize(R.styleable.MergedAppBarLayoutBehavior_Params_behavior_merged_appbar_anchor_point, 0));
+        setAnchorPoint(typedArray.getDimensionPixelSize(R.styleable.MergedAppBarLayoutBehavior_Params_behaviorMergedAppbarAnchorPoint, 0));
         typedArray.recycle();
     }
 
@@ -75,7 +75,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             waitForFinishingCloseIconAnimationAndShowTitle();
         } else {
             setTitleVisible(true);
-            setFullBackGroundColor(R.color.colorPrimary);
         }
     }
 
@@ -84,7 +83,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             @Override
             public void onAnimationEnd(Animator animation) {
                 setTitleVisible(true);
-                setFullBackGroundColor(R.color.colorPrimary);
                 currentCloseIconAnimator.removeListener(this);
             }
         });

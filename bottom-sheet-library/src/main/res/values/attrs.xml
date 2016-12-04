@@ -2,26 +2,27 @@
 <resources>
     <declare-styleable name="CustomBottomSheetBehavior">
         <attr name="anchorPoint" format="dimension" />
+        <attr name="enableInternalScrollingInAnchorPointState" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="BackdropBottomSheetBehavior_Params">
-        <attr name="behavior_backdrop_peekHeight" format="dimension" />
+        <attr name="behaviorBackdropPeekHeight" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="MergedAppBarLayoutBehavior_Params">
-        <attr name="behavior_merged_appbar_anchor_point" format="dimension" />
+        <attr name="behaviorMergedAppbarAnchorPoint" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="ScrollingAppBarLayoutBehavior_Params">
-        <attr name="behavior_scrolling_appbar_peek_height" format="dimension" />
+        <attr name="behaviorScrollingAppbarPeekHeight" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="ShowResultsButtonLayoutBehavior_Params">
-        <attr name="behavior_show_result_button_anchor_point" format="dimension" />
+        <attr name="behaviorShowResultButtonAnchorPoint" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="FadeInBehavior_Params">
-        <attr name="fade_in_behavior_anchor_point" format="dimension" />
+        <attr name="fadeInBehaviorAnchorPoint" format="dimension" />
     </declare-styleable>
 
 </resources>
