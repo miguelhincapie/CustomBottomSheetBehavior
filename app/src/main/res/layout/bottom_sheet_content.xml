@@ -51,8 +51,64 @@
             android:text="Highest price first" />
     </RadioGroup>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 1"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 2"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 3"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 4"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 5"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 6"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:text="Kategoria 7"
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
+
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="400dp" />
+        android:layout_height="@dimen/anchor_point_and_peek_height" />
 
 </LinearLayout>

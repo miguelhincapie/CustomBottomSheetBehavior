@@ -78,6 +78,8 @@ public class BottomSheetView extends NestedScrollView {
             layoutBehavior.setState(STATE_ANCHOR_POINT);
         } else if (STATE_ANCHOR_POINT == layoutBehavior.getState()) {
             layoutBehavior.setState(STATE_EXPANDED);
+        } else if (STATE_EXPANDED == layoutBehavior.getState()) {
+            layoutBehavior.setState(STATE_ANCHOR_POINT);
         }
     }
 

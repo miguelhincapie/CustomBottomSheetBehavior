@@ -348,8 +348,8 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, BottomSheetView child, View target, int dx,
                                   int dy, int[] consumed) {
         if (enableInternalScrollingInAnchorPointState) {
-            if (!isTouchingButton && child.getScrollY() != child.getScrollRange()
-                    && !(child.getScrollY() == 0 && isMovingDown)) {
+            if (shouldScrollInternally(child)) {
+                super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
                 return;
             }
         }
@@ -479,10 +479,21 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, BottomSheetView child, View target,
                                     float velocityX, float velocityY) {
+        if (enableInternalScrollingInAnchorPointState) {
+            if (shouldScrollInternally(child)) {
+                return super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY);
+            }
+        }
+
         return target == mNestedScrollingChildRef.get() &&
                 (mState != STATE_EXPANDED ||
                         super.onNestedPreFling(coordinatorLayout, child, target,
                                 velocityX, velocityY));
+    }
+
+    private boolean shouldScrollInternally(BottomSheetView child) {
+        return !isTouchingButton && child.getScrollY() != child.getScrollRange()
+                && !(child.getScrollY() == 0 && isMovingDown);
     }
 
     /**
