@@ -12,8 +12,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.View;
@@ -165,19 +163,12 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     }
 
     private void setToolbarVisible(boolean visible, final View child) {
-        Context context = child.getContext();
         if (visible && !isVisible) {
             child.setVisibility(View.VISIBLE);
-            ((AppCompatActivity) context).setSupportActionBar(toolbar);
             toolbar.setNavigationOnClickListener(onNavigationClickListener);
-            ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
             isVisible = true;
         } else if (!visible && isVisible) {
             child.setVisibility(View.INVISIBLE);
-            ((AppCompatActivity) context).setSupportActionBar(null);
             isVisible = false;
         }
     }

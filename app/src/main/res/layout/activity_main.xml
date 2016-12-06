@@ -56,6 +56,7 @@
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@android:color/white"
             app:anchorPoint="@dimen/anchor_point"
             app:behavior_peekHeight="@dimen/peek_height"
             app:enableInternalScrollingInAnchorPointState="true"

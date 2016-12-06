@@ -101,6 +101,7 @@ public class BottomSheetView extends NestedScrollView {
                     params.height);
             layoutParams.addRule(RelativeLayout.BELOW, R.id.title_container);
             bottomSheetContainer.addView(child, layoutParams);
+            titleContainer.bringToFront();
         }
     }
 
