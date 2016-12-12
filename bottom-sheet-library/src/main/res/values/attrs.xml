@@ -9,10 +9,6 @@
         <attr name="behaviorBackdropPeekHeight" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="MergedAppBarLayoutBehavior_Params">
-        <attr name="behaviorMergedAppbarAnchorPoint" format="dimension" />
-    </declare-styleable>
-
     <declare-styleable name="ScrollingAppBarLayoutBehavior_Params">
         <attr name="behaviorScrollingAppbarPeekHeight" format="dimension" />
     </declare-styleable>

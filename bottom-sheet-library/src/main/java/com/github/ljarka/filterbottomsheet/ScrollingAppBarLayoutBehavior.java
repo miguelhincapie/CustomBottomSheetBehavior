@@ -17,12 +17,14 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     private boolean isInit = false;
     private Context context;
-    private boolean isVisible = true;
+    private boolean isAppBarVisible = true;
+    private boolean isDependentViewTranslated = false;
 
     private int peekHeight;
     private View dependentView;
 
     private ValueAnimator appBarYValueAnimator;
+    private ValueAnimator dependentViewYValueAnimator;
 
     public ScrollingAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -47,27 +49,33 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             return false;
         }
 
-        setAppBarVisible((AppBarLayout) child, dependentView, dependency.getY() >= dependency.getHeight() - peekHeight);
+        boolean visible = dependency.getY() >= dependency.getHeight() - peekHeight;
+
+        setAppBarVisible((AppBarLayout) child, visible);
+
+        if (dependentView != null) {
+            translateDependentView(dependentView, visible, child.getHeight());
+        }
         return true;
     }
 
     @Override
     public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {
-        return new SavedState(super.onSaveInstanceState(parent, child), isVisible);
+        return new SavedState(super.onSaveInstanceState(parent, child), isAppBarVisible);
     }
 
     @Override
     public void onRestoreInstanceState(CoordinatorLayout parent, View child, Parcelable state) {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
-        this.isVisible = ss.isVisible;
+        this.isAppBarVisible = ss.isVisible;
         if (child.getHeight() > 0) {
             init(child);
         }
     }
 
     private void init(View child) {
-        if (!isVisible) {
+        if (!isAppBarVisible) {
             child.setTranslationY(-child.getHeight());
             if (dependentView != null) {
                 dependentView.setTranslationY(-child.getHeight());
@@ -84,8 +92,33 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         this.dependentView = dependentView;
     }
 
-    public void setAppBarVisible(final AppBarLayout appBarLayout, View dependentView, final boolean visible) {
-        if (visible == this.isVisible) {
+    public void translateDependentView(View dependentView, boolean translate, int translationDistance) {
+        if (isDependentViewTranslated == translate) {
+            return;
+        }
+
+        if (dependentViewYValueAnimator == null || !dependentViewYValueAnimator.isRunning()) {
+
+            int fromValue = (int) dependentView.getTranslationY();
+            int toValue = translate ? 0 : -translationDistance;
+
+            dependentViewYValueAnimator = ValueAnimator.ofFloat(fromValue, toValue);
+            dependentViewYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
+            dependentViewYValueAnimator
+                    .addUpdateListener(animation -> dependentView.setTranslationY((Float) animation.getAnimatedValue()));
+            dependentViewYValueAnimator.addListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    ScrollingAppBarLayoutBehavior.this.isDependentViewTranslated = translate;
+                }
+            });
+            dependentViewYValueAnimator.start();
+        }
+    }
+
+    public void setAppBarVisible(final AppBarLayout appBarLayout, final boolean visible) {
+        if (visible == this.isAppBarVisible) {
             return;
         }
 
@@ -94,28 +127,18 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             int toValue = visible ? 0 : -appBarLayout.getHeight();
 
             if (toValue == appBarLayout.getTranslationY()) {
-                isVisible = visible;
+                isAppBarVisible = visible;
                 return;
             }
 
-            boolean shouldAnimateDependentView = dependentView != null && !(toValue == dependentView.getTranslationY());
-
             appBarYValueAnimator = ValueAnimator.ofFloat(fromValue, toValue);
             appBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            appBarYValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    appBarLayout.setTranslationY((Float) animation.getAnimatedValue());
-                    if (shouldAnimateDependentView) {
-                        dependentView.setTranslationY((Float) animation.getAnimatedValue());
-                    }
-                }
-            });
+            appBarYValueAnimator.addUpdateListener(animation -> appBarLayout.setTranslationY((Float) animation.getAnimatedValue()));
             appBarYValueAnimator.addListener(new AnimatorListenerAdapter() {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    ScrollingAppBarLayoutBehavior.this.isVisible = visible;
+                    ScrollingAppBarLayoutBehavior.this.isAppBarVisible = visible;
                 }
             });
             appBarYValueAnimator.start();

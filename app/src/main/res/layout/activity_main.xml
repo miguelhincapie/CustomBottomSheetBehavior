@@ -74,7 +74,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            app:behaviorMergedAppbarAnchorPoint="@dimen/anchor_point"
             app:layout_behavior="@string/MergedAppBarLayoutBehavior" />
 
         <LinearLayout
