@@ -16,7 +16,7 @@ STATE_EXPANDED.<br><br>
 
 
 ## Motivation
-Spend more than 3 days looking snipet of code or stackoverflow answers about it with no lucky.
+Spend more than 3 days looking snipet of code or stackoverflow answers about it with no luck.
 
 ## Help or improvements
 Do you want to help?
