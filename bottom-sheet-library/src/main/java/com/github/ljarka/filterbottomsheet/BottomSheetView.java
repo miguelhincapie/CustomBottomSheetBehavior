@@ -65,8 +65,7 @@ public class BottomSheetView extends NestedScrollView {
         bottomSheetTitle = (TextView) findViewById(R.id.bottom_sheet_title);
         titleContainer = (ViewGroup) findViewById(R.id.title_container);
         titleBackground = findViewById(R.id.title_background);
-        bottomSheetTitleBackgroundColor = ContextCompat.getColor(context,
-                R.color.bottomSheetTitleBackground);
+        bottomSheetTitleBackgroundColor = ContextCompat.getColor(context, R.color.bottomSheetTitleBackground);
         titleBackground.setBackgroundColor(bottomSheetTitleBackgroundColor);
         bottomSheetTitle.setTextColor(Color.WHITE);
         titleContainer.setOnClickListener(v -> onTitleContainerClick());
@@ -85,8 +84,7 @@ public class BottomSheetView extends NestedScrollView {
 
     @Override
     public void addView(View child) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(MATCH_PARENT,
-                WRAP_CONTENT);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.BELOW, R.id.title_container);
         bottomSheetContainer.addView(child, layoutParams);
         titleContainer.bringToFront();
@@ -97,8 +95,7 @@ public class BottomSheetView extends NestedScrollView {
         if (bottomSheetContainer == null) {
             super.addView(child, params);
         } else {
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(params.width,
-                    params.height);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(params.width, params.height);
             layoutParams.addRule(RelativeLayout.BELOW, R.id.title_container);
             bottomSheetContainer.addView(child, layoutParams);
             titleContainer.bringToFront();
@@ -179,6 +176,7 @@ public class BottomSheetView extends NestedScrollView {
     public void addOnBottomSheetStateChangedListener(OnBottomSheetStateChangedListener listener) {
         lazyInitLayoutBehavior();
         layoutBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+
             @Override
             public void onStateChanged(@NonNull View bottomSheet, @BottomSheetBehavior.State int newState) {
                 if (listener != null) {
@@ -194,9 +192,8 @@ public class BottomSheetView extends NestedScrollView {
     }
 
     public void animateBackgroundColor(float alphaInPercent) {
-        titleBackground.setBackgroundColor(ColorUtils
-                .setAlphaComponent(bottomSheetTitleBackgroundColor,
-                        convertPercentToHex(alphaInPercent)));
+        titleBackground.setBackgroundColor(ColorUtils.setAlphaComponent(bottomSheetTitleBackgroundColor, convertPercentToHex
+                (alphaInPercent)));
     }
 
     public boolean isExpanded() {
@@ -251,8 +248,7 @@ public class BottomSheetView extends NestedScrollView {
         int scrollRange = 0;
         if (getChildCount() > 0) {
             View child = getChildAt(0);
-            scrollRange = Math.max(0,
-                    child.getHeight() - (getHeight() - getPaddingBottom() - getPaddingTop()));
+            scrollRange = Math.max(0, child.getHeight() - (getHeight() - getPaddingBottom() - getPaddingTop()));
         }
         return scrollRange;
     }
@@ -287,11 +283,9 @@ public class BottomSheetView extends NestedScrollView {
         if (!(params instanceof CoordinatorLayout.LayoutParams)) {
             throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
         }
-        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
-                .getBehavior();
+        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params).getBehavior();
         if (!(behavior instanceof BottomSheetBehavior)) {
-            throw new IllegalArgumentException(
-                    "The view is not associated with BottomSheetBehavior");
+            throw new IllegalArgumentException("The view is not associated with BottomSheetBehavior");
         }
         return (BottomSheetBehavior) behavior;
     }

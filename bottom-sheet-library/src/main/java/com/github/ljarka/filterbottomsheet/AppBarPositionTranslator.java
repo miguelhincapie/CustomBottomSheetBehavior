@@ -7,6 +7,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 public class AppBarPositionTranslator extends RecyclerView.OnScrollListener {
+
     private static final DecelerateInterpolator DECELERATE_INTERPOLATOR = new DecelerateInterpolator();
     private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
     private static final int VALUE_ANIMATOR_DURATION = 100;
@@ -37,8 +38,7 @@ public class AppBarPositionTranslator extends RecyclerView.OnScrollListener {
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
             if (currentAnimator == null || !currentAnimator.isRunning()) {
                 if (appBarLayout.getTranslationY() <= -(appBarLayout.getHeight() / 2f)) {
-                    currentAnimator = ValueAnimator.ofFloat(appBarLayout.getTranslationY(),
-                            -appBarLayout.getHeight());
+                    currentAnimator = ValueAnimator.ofFloat(appBarLayout.getTranslationY(), -appBarLayout.getHeight());
                     currentAnimator.addUpdateListener(animator -> {
                         appBarLayout.setTranslationY((float) animator.getAnimatedValue());
                     });

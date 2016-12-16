@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 public class MainActivity extends AppCompatActivity {
+
     private ActivityMainBinding binding;
 
     @Override
@@ -40,14 +41,12 @@ public class MainActivity extends AppCompatActivity {
                 bottomSheet.close();
             }
         });
-        binding.overlay.setClickable(bottomSheet.isExpanded());
 
         binding.showResultButton.setOnClickListener(view -> bottomSheet.close());
-        ((RadioGroup) findViewById(R.id.radio_group))
-                .setOnCheckedChangeListener((radioGroup, i) -> simulateLongNetworkOperation());
+        ((RadioGroup) findViewById(R.id.radio_group)).setOnCheckedChangeListener((radioGroup, i) ->
+                simulateLongNetworkOperation());
         initRecyclerVIew();
-        ScrollingAppBarLayoutBehavior.from(binding.appBar)
-                .setScrollingDependentView(binding.recyclerView);
+        ScrollingAppBarLayoutBehavior.from(binding.appBar).setScrollingDependentView(binding.recyclerView);
         binding.recyclerView.addOnScrollListener(new AppBarPositionTranslator(binding.appBar));
         binding.bottomSheet.addOnBottomSheetStateChangedListener(state -> {
             if (state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -78,9 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void simulateLongNetworkOperation() {
         binding.progressBar.setVisibility(VISIBLE);
-        Observable.just(null).delay(2, SECONDS)
-                .observeOn(mainThread())
-                .subscribe(it -> binding.progressBar.setVisibility(GONE));
+        Observable.just(null).delay(2, SECONDS).observeOn(mainThread()).subscribe(it -> binding.progressBar.setVisibility(GONE));
     }
 
     private void initToolbar(Toolbar toolbar) {

@@ -29,11 +29,9 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     public ScrollingAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.ScrollingAppBarLayoutBehavior_Params);
-        setPeekHeight(a.getDimensionPixelSize(
-                R.styleable
-                        .ScrollingAppBarLayoutBehavior_Params_behaviorScrollingAppbarPeekHeight, 0));
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollingAppBarLayoutBehavior_Params);
+        setPeekHeight(a.getDimensionPixelSize(R.styleable
+                .ScrollingAppBarLayoutBehavior_Params_behaviorScrollingAppbarPeekHeight, 0));
         a.recycle();
     }
 
@@ -54,7 +52,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         setAppBarVisible((AppBarLayout) child, visible);
 
         if (dependentView != null) {
-            translateDependentView(dependentView, visible, child.getHeight());
+            translateDependentView(dependentView, !visible, child.getHeight());
         }
         return true;
     }
@@ -100,12 +98,12 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         if (dependentViewYValueAnimator == null || !dependentViewYValueAnimator.isRunning()) {
 
             int fromValue = (int) dependentView.getTranslationY();
-            int toValue = translate ? 0 : -translationDistance;
+            int toValue = translate ? -translationDistance : 0;
 
             dependentViewYValueAnimator = ValueAnimator.ofFloat(fromValue, toValue);
             dependentViewYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            dependentViewYValueAnimator
-                    .addUpdateListener(animation -> dependentView.setTranslationY((Float) animation.getAnimatedValue()));
+            dependentViewYValueAnimator.addUpdateListener(animation -> dependentView.setTranslationY((Float) animation
+                    .getAnimatedValue()));
             dependentViewYValueAnimator.addListener(new AnimatorListenerAdapter() {
 
                 @Override
@@ -133,7 +131,8 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
             appBarYValueAnimator = ValueAnimator.ofFloat(fromValue, toValue);
             appBarYValueAnimator.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            appBarYValueAnimator.addUpdateListener(animation -> appBarLayout.setTranslationY((Float) animation.getAnimatedValue()));
+            appBarYValueAnimator.addUpdateListener(animation -> appBarLayout.setTranslationY((Float) animation.getAnimatedValue
+                    ()));
             appBarYValueAnimator.addListener(new AnimatorListenerAdapter() {
 
                 @Override
@@ -145,26 +144,15 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         }
     }
 
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = context.getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
     @SuppressWarnings("unchecked")
     public static <V extends View> ScrollingAppBarLayoutBehavior from(V view) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof CoordinatorLayout.LayoutParams)) {
             throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
         }
-        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
-                .getBehavior();
+        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params).getBehavior();
         if (!(behavior instanceof ScrollingAppBarLayoutBehavior)) {
-            throw new IllegalArgumentException(
-                    "The view is not associated with ScrollingAppBarLayoutBehavior");
+            throw new IllegalArgumentException("The view is not associated with ScrollingAppBarLayoutBehavior");
         }
         return (ScrollingAppBarLayoutBehavior) behavior;
     }
@@ -189,17 +177,17 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
             out.writeByte((byte) (isVisible ? 1 : 0));
         }
 
-        public static final Creator<SavedState> CREATOR =
-                new Creator<SavedState>() {
-                    @Override
-                    public SavedState createFromParcel(Parcel source) {
-                        return new SavedState(source);
-                    }
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
 
-                    @Override
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                };
+            @Override
+            public SavedState createFromParcel(Parcel source) {
+                return new SavedState(source);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }
