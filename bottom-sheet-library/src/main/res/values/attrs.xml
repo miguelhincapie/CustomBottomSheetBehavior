@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomBottomSheetBehavior">
+        <attr name="anchorPoint" format="dimension" />
+        <attr name="enableInternalScrollingInAnchorPointState" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="BackdropBottomSheetBehavior_Params">
+        <attr name="behaviorBackdropPeekHeight" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="ScrollingAppBarLayoutBehavior_Params">
+        <attr name="behaviorScrollingAppbarPeekHeight" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="ShowResultsButtonLayoutBehavior_Params">
+        <attr name="behaviorShowResultButtonAnchorPoint" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="FadeInBehavior_Params">
+        <attr name="fadeInBehaviorAnchorPoint" format="dimension" />
+    </declare-styleable>
+
+</resources>
