@@ -66,7 +66,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
     @State
     private int mState = STATE_COLLAPSED;
 
-    private ViewDragHelper mViewDragHelper;
+    private ViewDragHelperDelegate mViewDragHelperDelegate = ViewDragHelpers.empty();
 
     private boolean mIgnoreEvents;
 
@@ -158,8 +158,9 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
         } else if (mState == STATE_COLLAPSED) {
             ViewCompat.offsetTopAndBottom(child, mMaxOffset);
         }
-        if (mViewDragHelper == null) {
-            mViewDragHelper = ViewDragHelper.create(parent, new CustomDragHelperCallback(child));
+        if (mViewDragHelperDelegate == null) {
+            mViewDragHelperDelegate = ViewDragHelpers.wrap(ViewDragHelper.create(parent,
+                    new CustomDragHelperCallback(child)));
         }
         mViewRef = new WeakReference<>(child);
         mNestedScrollingChildRef = new WeakReference<>(findScrollingChild(child));
@@ -218,7 +219,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
                         && !parent.isPointInChildBounds(child, initialX, mInitialY);
                 break;
         }
-        if (!mIgnoreEvents && mViewDragHelper.shouldInterceptTouchEvent(event)) {
+        if (!mIgnoreEvents && mViewDragHelperDelegate.shouldInterceptTouchEvent(event)) {
             return true;
         }
         // We have to handle cases that the ViewDragHelper does not capture the bottom sheet because
@@ -228,7 +229,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
         return action == MotionEvent.ACTION_MOVE && scroll != null &&
                 !mIgnoreEvents && mState != STATE_DRAGGING &&
                 !parent.isPointInChildBounds(scroll, (int) event.getX(), (int) event.getY()) &&
-                Math.abs(mInitialY - event.getY()) > mViewDragHelper.getTouchSlop();
+                Math.abs(mInitialY - event.getY()) > mViewDragHelperDelegate.getTouchSlop();
     }
 
     @Override
@@ -240,7 +241,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
         if (mState == STATE_DRAGGING && action == MotionEvent.ACTION_DOWN) {
             return true;
         }
-        mViewDragHelper.processTouchEvent(event);
+        mViewDragHelperDelegate.processTouchEvent(event);
         // Record the velocity
         if (action == MotionEvent.ACTION_DOWN) {
             reset();
@@ -252,8 +253,8 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
         // The ViewDragHelper tries to capture only the top-most View. We have to explicitly tell it
         // to capture the bottom sheet in case it is not captured and the touch slop is passed.
         if (action == MotionEvent.ACTION_MOVE && !mIgnoreEvents) {
-            if (Math.abs(mInitialY - event.getY()) > mViewDragHelper.getTouchSlop()) {
-                mViewDragHelper.captureChildView(child, event.getPointerId(event.getActionIndex()));
+            if (Math.abs(mInitialY - event.getY()) > mViewDragHelperDelegate.getTouchSlop()) {
+                mViewDragHelperDelegate.captureChildView(child, event.getPointerId(event.getActionIndex()));
             }
         }
         return !mIgnoreEvents;
@@ -371,7 +372,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
                 targetState = STATE_ANCHOR_POINT;
             }
         }
-        if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
+        if (mViewDragHelperDelegate.smoothSlideViewTo(child, child.getLeft(), top)) {
             setStateInternal(STATE_SETTLING);
             ViewCompat.postOnAnimation(child, new SettleRunnable(child, targetState));
         } else {
@@ -436,7 +437,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
             throw new IllegalArgumentException("Illegal state argument: " + state);
         }
         setStateInternal(STATE_SETTLING);
-        if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
+        if (mViewDragHelperDelegate.smoothSlideViewTo(child, child.getLeft(), top)) {
             ViewCompat.postOnAnimation(child, new SettleRunnable(child, state));
         }
     }
@@ -552,7 +553,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
                 top = mMaxOffset;
                 targetState = STATE_COLLAPSED;
             }
-            if (mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top)) {
+            if (mViewDragHelperDelegate.settleCapturedViewAt(releasedChild.getLeft(), top)) {
                 setStateInternal(STATE_SETTLING);
                 ViewCompat.postOnAnimation(releasedChild, new SettleRunnable(releasedChild, targetState));
             } else {
@@ -611,7 +612,7 @@ public class BottomSheetBehavior extends CoordinatorLayout.Behavior<BottomSheetV
 
         @Override
         public void run() {
-            if (mViewDragHelper != null && mViewDragHelper.continueSettling(true)) {
+            if (mViewDragHelperDelegate.continueSettling(true)) {
                 ViewCompat.postOnAnimation(mView, this);
             } else {
                 setStateInternal(mTargetState);
