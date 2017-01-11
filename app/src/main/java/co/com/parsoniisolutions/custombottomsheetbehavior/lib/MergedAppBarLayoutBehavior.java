@@ -87,7 +87,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
 
         if (!mInit) {
-            init(parent, child);
+            init(parent, child, dependency);
         }
         /**
          * Following docs we should return true if the Behavior changed the child view's size or position, false otherwise
@@ -106,6 +106,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
         } else if(isDependencyYBelowToolbar(child, dependency) && ! isDependencyYReachTop(dependency)){
 
+            childMoved = setToolbarVisible(true,child);
             if(isStatusBarVisible())
                 setStatusBarBackgroundVisible(false);
             if(isTitleVisible())
@@ -115,6 +116,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
         } else if(isDependencyYBelowStatusToolbar(child, dependency) || isDependencyYReachTop(dependency)){
 
+            childMoved = setToolbarVisible(true,child);
             if(!isStatusBarVisible())
                 setStatusBarBackgroundVisible(true);
             if(!isTitleVisible())
@@ -125,7 +127,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return childMoved;
     }
 
-    private void init(@NonNull CoordinatorLayout parent, @NonNull View child){
+    private void init(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency){
 
         AppBarLayout appBarLayout = (AppBarLayout) child;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -144,7 +146,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mInitialY = child.getY();
 
         child.setVisibility(mVisible ? View.VISIBLE : View.INVISIBLE);
-        setStatusBarBackgroundVisible(mVisible);
+//        setStatusBarBackgroundVisible(mVisible);
 
         setFullBackGroundColor(mVisible && mCurrentTitleAlpha == 1 ? R.color.colorPrimary: android.R.color.transparent);
         setPartialBackGroundHeight(0);
