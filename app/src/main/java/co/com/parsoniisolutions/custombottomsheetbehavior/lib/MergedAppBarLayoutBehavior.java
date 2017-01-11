@@ -29,6 +29,19 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
+/**
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ */
 
 /**
  * This behavior should be applied on an AppBarLayout... More Explanations coming soon
@@ -37,7 +50,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     private static final String TAG = MergedAppBarLayoutBehavior.class.getSimpleName();
 
-    boolean mInit = false;
+    private boolean mInit = false;
 
     private FrameLayout.LayoutParams mBackGroundLayoutParams;
 
@@ -74,16 +87,19 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
         if (!mInit) {
             init(child);
-            return false;
         }
+        /**
+         * Following docs we should return true if the Behavior changed the child view's size or position, false otherwise
+         */
+        boolean childMoved = false;
 
         if(isDependencyYBelowAnchorPoint(dependency)){
 
-            setToolbarVisible(false,child);
+            childMoved = setToolbarVisible(false,child);
 
         }else if(isDependencyYBetweenAnchorPointAndToolbar(child,dependency)){
 
-            setToolbarVisible(true,child);
+            childMoved = setToolbarVisible(true,child);
             setFullBackGroundColor(android.R.color.transparent);
             setPartialBackGroundHeight(0);
 
@@ -105,24 +121,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             setFullBackGroundColor(R.color.colorPrimary);
             setPartialBackGroundHeight(0);
         }
-        return false;
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {
-        return new SavedState(super.onSaveInstanceState(parent, child),
-                mVisible,
-                mToolbarTitle,
-                mCurrentTitleAlpha);
-    }
-
-    @Override
-    public void onRestoreInstanceState(CoordinatorLayout parent, View child, Parcelable state) {
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(parent, child, ss.getSuperState());
-        this.mVisible = ss.mVisible;
-        this.mToolbarTitle = ss.mToolbarTitle;
-        this.mCurrentTitleAlpha = ss.mTitleAlpha;
+        return childMoved;
     }
 
     private void init(@NonNull View child){
@@ -193,9 +192,11 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return null;
     }
 
-    private void setToolbarVisible(boolean visible, final View child){
+    private boolean setToolbarVisible(boolean visible, final View child){
         ViewPropertyAnimator mAppBarLayoutAnimation;
+        boolean childMoved = false;
         if(visible && !mVisible){
+            childMoved = true;
             child.setY(-child.getHeight()/3);
             mAppBarLayoutAnimation = child.animate().setDuration(mContext.getResources().getInteger(android.R.integer.config_shortAnimTime));
             mAppBarLayoutAnimation.setListener(new AnimatorListenerAdapter() {
@@ -236,6 +237,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             });
             mAppBarLayoutAnimation.alpha(0).start();
         }
+
+        return childMoved;
     }
 
     private boolean isTitleVisible(){
@@ -301,6 +304,24 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     public void setAnchorPoint(float anchorPoint) {
         this.mAnchorPoint = anchorPoint;
+    }
+
+
+    @Override
+    public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {
+        return new SavedState(super.onSaveInstanceState(parent, child),
+                mVisible,
+                mToolbarTitle,
+                mCurrentTitleAlpha);
+    }
+
+    @Override
+    public void onRestoreInstanceState(CoordinatorLayout parent, View child, Parcelable state) {
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(parent, child, ss.getSuperState());
+        this.mVisible = ss.mVisible;
+        this.mToolbarTitle = ss.mToolbarTitle;
+        this.mCurrentTitleAlpha = ss.mTitleAlpha;
     }
 
     protected static class SavedState extends View.BaseSavedState {

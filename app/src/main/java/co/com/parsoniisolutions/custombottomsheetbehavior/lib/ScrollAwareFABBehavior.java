@@ -9,28 +9,42 @@ import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
 
-/*
- * Copyright 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ */
+
+/**
+ * This class only cares about hide or unhide the FAB because the anchor behavior is something
+ * already in FAB.
  */
 public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
 
-    float offset;
+    /**
+     * One of the point used to set hide() or show() in FAB
+     */
+    private float offset;
+    /**
+     * The FAB should be hidden when it reach {@link #offset} or when {@link BottomSheetBehaviorGoogleMapsLike}
+     * is visually lower than {@link BottomSheetBehaviorGoogleMapsLike#getPeekHeight()}.
+     * We got a reference to the object to allow change dynamically PeekHeight in BottomSheet and
+     * got updated here.
+     */
+    private BottomSheetBehaviorGoogleMapsLike bottomSheetBehavior;
 
     public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
         super();
         offset = 0;
+        bottomSheetBehavior = null;
     }
 
     @Override
@@ -48,21 +62,44 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionButton child, View dependency) {
+        /**
+         * Because we are not moving it, we always return false in this method.
+         */
 
         if (offset == 0)
             setOffsetValue(parent);
 
-        if (dependency.getY() <=0)
+        if (bottomSheetBehavior == null)
+            getBottomSheetBehavior(parent);
+
+        if (dependency.getY() <=0) {
+            if (child.getVisibility() == View.VISIBLE)
+                child.hide();
             return false;
+        }
 
         if (child.getY() <= (offset + child.getHeight()) && child.getVisibility() == View.VISIBLE)
             child.hide();
-        else if (child.getY() > offset && child.getVisibility() != View.VISIBLE)
-            child.show();
+        else if (child.getY() > offset) {
+
+            /**
+             * We are calculating every time point in Y where BottomSheet get {@link BottomSheetBehaviorGoogleMapsLike#STATE_COLLAPSED}.
+             * If PeekHeight change dynamically we can reflect the behavior asap.
+             */
+            int collapsedY = dependency.getHeight() - bottomSheetBehavior.getPeekHeight();
+            if ((dependency.getY() > collapsedY))
+                child.hide();
+            else
+                child.show();
+        }
 
         return false;
     }
 
+    /**
+     * Define one of the point in where the FAB should be hide when it reachs that point.
+     * @param coordinatorLayout container of BottomSheet and AppBarLayout
+     */
     private void setOffsetValue(CoordinatorLayout coordinatorLayout) {
 
         for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
@@ -75,6 +112,26 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
                     offset = child.getY()+child.getHeight();
                     break;
                 }
+            }
+        }
+    }
+
+    /**
+     * Look into the CoordiantorLayout for the {@link BottomSheetBehaviorGoogleMapsLike}
+     * @param coordinatorLayout with app:layout_behavior= {@link BottomSheetBehaviorGoogleMapsLike}
+     */
+    private void getBottomSheetBehavior(CoordinatorLayout coordinatorLayout) {
+
+        for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
+            View child = coordinatorLayout.getChildAt(i);
+
+            if (child instanceof NestedScrollView) {
+
+                try {
+                    bottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    break;
+                }
+                catch (IllegalArgumentException e){}
             }
         }
     }

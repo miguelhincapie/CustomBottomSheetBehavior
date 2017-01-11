@@ -19,6 +19,19 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
+/**
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ */
 
 /**
  *
@@ -27,7 +40,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
 
     private static final String TAG = ScrollingAppBarLayoutBehavior.class.getSimpleName();
 
-    boolean mInit = false;
+    private boolean mInit = false;
     private Context mContext;
     private boolean mVisible = true;
 
@@ -51,8 +64,7 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
         if (!mInit) {
-            init(child);
-            return false;
+            return init(child, dependency);
         }
         setAppBarVisible((AppBarLayout)child,dependency.getY() >= dependency.getHeight() - mPeekHeight);
         return true;
@@ -70,10 +82,23 @@ public class ScrollingAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBeh
         this.mVisible = ss.mVisible;
     }
 
-    private void init(View child) {
+    private boolean init(View child, View dependency) {
+        /**
+         * First we need to know if dependency view is upper or lower compared with
+         * {@link #mPeekHeight} Y position to know if need to show the AppBar at beginning.
+         */
+        int mCollapsedY = dependency.getHeight() - mPeekHeight;
+        mVisible = (dependency.getY() >= mCollapsedY);
+
         setStatusBarBackgroundVisible(mVisible);
         if(!mVisible) child.setY((int) child.getY() - child.getHeight() - getStatusBarHeight());
         mInit = true;
+        /**
+         * Following {@link #onDependentViewChanged} docs, we need to return true if the
+         * Behavior changed the child view's size or position, false otherwise.
+         * In our case we only move it if mVisible got false in this method.
+         */
+        return !mVisible;
     }
 
     public void setPeekHeight(int peekHeight) {
