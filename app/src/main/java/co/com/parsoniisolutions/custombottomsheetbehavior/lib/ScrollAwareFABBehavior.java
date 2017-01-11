@@ -39,12 +39,12 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
      * We got a reference to the object to allow change dynamically PeekHeight in BottomSheet and
      * got updated here.
      */
-    private BottomSheetBehaviorGoogleMapsLike bottomSheetBehavior;
+    private BottomSheetBehaviorGoogleMapsLike mBottomSheetBehavior;
 
     public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
         super();
         offset = 0;
-        bottomSheetBehavior = null;
+        mBottomSheetBehavior = null;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
         if (offset == 0)
             setOffsetValue(parent);
 
-        if (bottomSheetBehavior == null)
+        if (mBottomSheetBehavior == null)
             getBottomSheetBehavior(parent);
 
         if (dependency.getY() <=0) {
@@ -86,7 +86,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
              * We are calculating every time point in Y where BottomSheet get {@link BottomSheetBehaviorGoogleMapsLike#STATE_COLLAPSED}.
              * If PeekHeight change dynamically we can reflect the behavior asap.
              */
-            int collapsedY = dependency.getHeight() - bottomSheetBehavior.getPeekHeight();
+            int collapsedY = dependency.getHeight() - mBottomSheetBehavior.getPeekHeight();
             if ((dependency.getY() > collapsedY))
                 child.hide();
             else
@@ -128,7 +128,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
             if (child instanceof NestedScrollView) {
 
                 try {
-                    bottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    mBottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
                     break;
                 }
                 catch (IllegalArgumentException e){}

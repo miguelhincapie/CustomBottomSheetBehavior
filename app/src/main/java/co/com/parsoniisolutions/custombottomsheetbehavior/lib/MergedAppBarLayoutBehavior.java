@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -55,7 +54,12 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private FrameLayout.LayoutParams mBackGroundLayoutParams;
 
     private Context mContext;
-    private float mAnchorPoint;
+    /**
+     * To avoid using multiple "peekheight=" in XML and looking flexibility allowing {@link BottomSheetBehaviorGoogleMapsLike#mPeekHeight}
+     * get changed dynamically we get the {@link NestedScrollView} that has
+     * "app:layout_behavior=" {@link BottomSheetBehaviorGoogleMapsLike} inside the {@link CoordinatorLayout}
+     */
+    private BottomSheetBehaviorGoogleMapsLike mBottomSheetBehavior;
     private float mInitialY;
     private boolean mVisible = false;
 
@@ -72,9 +76,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     public MergedAppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MergedAppBarLayoutBehavior_Params);
-        setAnchorPoint(a.getDimensionPixelSize(R.styleable.MergedAppBarLayoutBehavior_Params_behavior_merged_appbar_anchor_point, 0));
-        a.recycle();
     }
 
     @Override
@@ -86,7 +87,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
 
         if (!mInit) {
-            init(child);
+            init(parent, child);
         }
         /**
          * Following docs we should return true if the Behavior changed the child view's size or position, false otherwise
@@ -124,7 +125,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return childMoved;
     }
 
-    private void init(@NonNull View child){
+    private void init(@NonNull CoordinatorLayout parent, @NonNull View child){
 
         AppBarLayout appBarLayout = (AppBarLayout) child;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -134,6 +135,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mToolbar = (Toolbar) appBarLayout.findViewById(R.id.expanded_toolbar);
         mBackground = appBarLayout.findViewById(R.id.background);
         mBackGroundLayoutParams = (FrameLayout.LayoutParams) mBackground.getLayoutParams();
+        getBottomSheetBehavior(parent);
 
         mTitleTextView = findTitleTextView(mToolbar);
         if (mTitleTextView == null)
@@ -151,12 +153,32 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mInit = true;
     }
 
+    /**
+     * Look into the CoordiantorLayout for the {@link BottomSheetBehaviorGoogleMapsLike}
+     * @param coordinatorLayout with app:layout_behavior= {@link BottomSheetBehaviorGoogleMapsLike}
+     */
+    private void getBottomSheetBehavior(CoordinatorLayout coordinatorLayout) {
+
+        for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
+            View child = coordinatorLayout.getChildAt(i);
+
+            if (child instanceof NestedScrollView) {
+
+                try {
+                    mBottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    break;
+                }
+                catch (IllegalArgumentException e){}
+            }
+        }
+    }
+
     private boolean isDependencyYBelowAnchorPoint(@NonNull View dependency){
-        return dependency.getY() > mAnchorPoint;
+        return dependency.getY() > mBottomSheetBehavior.mAnchorPoint;
     }
 
     private boolean isDependencyYBetweenAnchorPointAndToolbar(@NonNull View child, @NonNull View dependency){
-        return dependency.getY() <= mAnchorPoint && dependency.getY() > child.getY() + child.getHeight();
+        return dependency.getY() <= mBottomSheetBehavior.mAnchorPoint && dependency.getY() > child.getY() + child.getHeight();
     }
 
     private boolean isDependencyYBelowToolbar(@NonNull View child, @NonNull View dependency){
@@ -301,11 +323,6 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         if(this.mToolbar!=null)
             this.mToolbar.setTitle(title);
     }
-
-    public void setAnchorPoint(float anchorPoint) {
-        this.mAnchorPoint = anchorPoint;
-    }
-
 
     @Override
     public Parcelable onSaveInstanceState(CoordinatorLayout parent, View child) {

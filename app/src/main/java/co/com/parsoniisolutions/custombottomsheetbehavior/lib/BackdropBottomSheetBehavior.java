@@ -1,13 +1,10 @@
 package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
-
-import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 
 /**
  ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,11 +33,11 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
  */
 public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
     /**
-     * Defines the point in where the backdrop will be consider being in collapsed state.
-     * It <bold>should</bold> be the same used in {@link BottomSheetBehaviorGoogleMapsLike} if you
-     * want the image got hidden behind the BottomSheet when it reaches the collapsed state.
+     * To avoid using multiple "peekheight=" in XML and looking flexibility allowing {@link BottomSheetBehaviorGoogleMapsLike#mPeekHeight}
+     * get changed dynamically we get the {@link NestedScrollView} that has
+     * "app:layout_behavior=" {@link BottomSheetBehaviorGoogleMapsLike} inside the {@link CoordinatorLayout}
      */
-    private int mPeekHeight;
+    private BottomSheetBehaviorGoogleMapsLike mBottomSheetBehavior;
     /**
      * Following {@link #onDependentViewChanged}'s docs mCurrentChildY just save the child Y
      * position.
@@ -49,9 +46,6 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     public BackdropBottomSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BackdropBottomSheetBehavior_Params);
-        setPeekHeight(a.getDimensionPixelSize(R.styleable.BackdropBottomSheetBehavior_Params_behavior_backdrop_peekHeight, 0));
-        a.recycle();
     }
 
     @Override
@@ -62,32 +56,33 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
         /**
-         * mCollapsedY and mAnchorPointY are calculated every time looking for
-         * flexibility, in case that dependency's height, child's height or {@link #mPeekHeight}'s
+         * collapsedY and achorPointY are calculated every time looking for
+         * flexibility, in case that dependency's height, child's height or {@link BottomSheetBehaviorGoogleMapsLike#getPeekHeight()}'s
          * value changes throught the time, I mean, you can have a {@link android.widget.ImageView}
          * using images with different sizes and you don't want to resize them or so
          */
-
+        if (mBottomSheetBehavior == null)
+            getBottomSheetBehavior(parent);
         /**
          * mCollapsedY: Y position in where backdrop get hidden behind dependency.
-         * mPeekHeight and mCollapsed are the same point on screen.
+         * {@link BottomSheetBehaviorGoogleMapsLike#getPeekHeight()} and collapsedY are the same point on screen.
          */
-        int mCollapsedY = dependency.getHeight() - mPeekHeight;
+        int collapsedY = dependency.getHeight() - mBottomSheetBehavior.getPeekHeight();
         /**
-         * mAnchorPointY: with top being Y=0, mAnchorPointY defines the point in Y where could
+         * achorPointY: with top being Y=0, achorPointY defines the point in Y where could
          * happen 2 things:
          * The backdrop should be moved behind dependency view (when {@link #mCurrentChildY} got
          * positive values) or the dependency view overlaps the backdrop (when
          * {@link #mCurrentChildY} got negative values)
          */
-        int mAnchorPointY = child.getHeight();
+        int achorPointY = child.getHeight();
         /**
          * lastCurrentChildY: Just to know if we need to return true or false at the end of this
          * method.
          */
         int lastCurrentChildY = mCurrentChildY;
 
-        if((mCurrentChildY = (int) ((dependency.getY()-mAnchorPointY) * mCollapsedY / (mCollapsedY-mAnchorPointY))) <= 0)
+        if((mCurrentChildY = (int) ((dependency.getY()-achorPointY) * collapsedY / (collapsedY-achorPointY))) <= 0)
             child.setY(mCurrentChildY = 0);
         else
             child.setY(mCurrentChildY);
@@ -95,12 +90,22 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
     }
 
     /**
-     * Set the PeekHeight like you do in {@link BottomSheetBehaviorGoogleMapsLike}
-     * @param peakHeight It <bold>should</bold> be the same used in {@link BottomSheetBehaviorGoogleMapsLike}
-     *                   if you want the image got hidden behind the BottomSheet when it reaches
-     *                   the collapsed state.
+     * Look into the CoordiantorLayout for the {@link BottomSheetBehaviorGoogleMapsLike}
+     * @param coordinatorLayout with app:layout_behavior= {@link BottomSheetBehaviorGoogleMapsLike}
      */
-    public void setPeekHeight(int peakHeight) {
-        this.mPeekHeight = peakHeight;
+    private void getBottomSheetBehavior(CoordinatorLayout coordinatorLayout) {
+
+        for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
+            View child = coordinatorLayout.getChildAt(i);
+
+            if (child instanceof NestedScrollView) {
+
+                try {
+                    mBottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    break;
+                }
+                catch (IllegalArgumentException e){}
+            }
+        }
     }
 }
