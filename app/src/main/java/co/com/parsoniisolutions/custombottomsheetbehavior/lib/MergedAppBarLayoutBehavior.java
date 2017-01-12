@@ -27,6 +27,8 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
+
 import co.com.parsoniisolutions.custombottomsheetbehavior.R;
 /**
  ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +42,8 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
+ ~
+ ~ https://github.com/miguelhincapie/CustomBottomSheetBehavior
  */
 
 /**
@@ -59,7 +63,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
      * get changed dynamically we get the {@link NestedScrollView} that has
      * "app:layout_behavior=" {@link BottomSheetBehaviorGoogleMapsLike} inside the {@link CoordinatorLayout}
      */
-    private BottomSheetBehaviorGoogleMapsLike mBottomSheetBehavior;
+    private WeakReference<BottomSheetBehaviorGoogleMapsLike> mBottomSheetBehaviorRef;
     private float mInitialY;
     private boolean mVisible = false;
 
@@ -80,25 +84,32 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        return dependency instanceof NestedScrollView;
+        if (dependency instanceof NestedScrollView) {
+            try {
+                BottomSheetBehaviorGoogleMapsLike.from(dependency);
+                return true;
+            }
+            catch (IllegalArgumentException e){}
+        }
+        return false;
     }
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
 
         if (!mInit) {
-            init(parent, child, dependency);
+            init(parent, child);
         }
         /**
          * Following docs we should return true if the Behavior changed the child view's size or position, false otherwise
          */
         boolean childMoved = false;
 
-        if(isDependencyYBelowAnchorPoint(dependency)){
+        if(isDependencyYBelowAnchorPoint(parent, dependency)){
 
             childMoved = setToolbarVisible(false,child);
 
-        }else if(isDependencyYBetweenAnchorPointAndToolbar(child,dependency)){
+        }else if(isDependencyYBetweenAnchorPointAndToolbar(parent, child,dependency)){
 
             childMoved = setToolbarVisible(true,child);
             setFullBackGroundColor(android.R.color.transparent);
@@ -127,7 +138,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         return childMoved;
     }
 
-    private void init(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency){
+    private void init(@NonNull CoordinatorLayout parent, @NonNull View child){
 
         AppBarLayout appBarLayout = (AppBarLayout) child;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -153,13 +164,14 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         mTitleTextView.setText(mToolbarTitle);
         mTitleTextView.setAlpha(mCurrentTitleAlpha);
         mInit = true;
+        setToolbarVisible(false,child);
     }
 
     /**
      * Look into the CoordiantorLayout for the {@link BottomSheetBehaviorGoogleMapsLike}
      * @param coordinatorLayout with app:layout_behavior= {@link BottomSheetBehaviorGoogleMapsLike}
      */
-    private void getBottomSheetBehavior(CoordinatorLayout coordinatorLayout) {
+    private void getBottomSheetBehavior(@NonNull CoordinatorLayout coordinatorLayout) {
 
         for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
             View child = coordinatorLayout.getChildAt(i);
@@ -167,7 +179,8 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
             if (child instanceof NestedScrollView) {
 
                 try {
-                    mBottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    BottomSheetBehaviorGoogleMapsLike temp = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    mBottomSheetBehaviorRef = new WeakReference<>(temp);
                     break;
                 }
                 catch (IllegalArgumentException e){}
@@ -175,12 +188,16 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
         }
     }
 
-    private boolean isDependencyYBelowAnchorPoint(@NonNull View dependency){
-        return dependency.getY() > mBottomSheetBehavior.mAnchorPoint;
+    private boolean isDependencyYBelowAnchorPoint(@NonNull CoordinatorLayout parent, @NonNull View dependency){
+        if (mBottomSheetBehaviorRef == null || mBottomSheetBehaviorRef.get() == null)
+            getBottomSheetBehavior(parent);
+        return dependency.getY() > mBottomSheetBehaviorRef.get().getAnchorPoint();
     }
 
-    private boolean isDependencyYBetweenAnchorPointAndToolbar(@NonNull View child, @NonNull View dependency){
-        return dependency.getY() <= mBottomSheetBehavior.mAnchorPoint && dependency.getY() > child.getY() + child.getHeight();
+    private boolean isDependencyYBetweenAnchorPointAndToolbar(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency){
+        if (mBottomSheetBehaviorRef == null || mBottomSheetBehaviorRef.get() == null)
+            getBottomSheetBehavior(parent);
+        return dependency.getY() <= mBottomSheetBehaviorRef.get().getAnchorPoint() && dependency.getY() > child.getY() + child.getHeight();
     }
 
     private boolean isDependencyYBelowToolbar(@NonNull View child, @NonNull View dependency){
@@ -272,7 +289,7 @@ public class MergedAppBarLayoutBehavior extends AppBarLayout.ScrollingViewBehavi
     private void setTitleVisible(boolean visible){
 
         if((visible && mTitleTextView.getAlpha() == 1)||
-          (!visible && mTitleTextView.getAlpha() == 0))
+                (!visible && mTitleTextView.getAlpha() == 0))
             return;
 
         if(mTitleAlphaValueAnimator == null || !mTitleAlphaValueAnimator.isRunning()){

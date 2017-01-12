@@ -38,6 +38,8 @@ import co.com.parsoniisolutions.custombottomsheetbehavior.R;
  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
+ ~
+ ~ https://github.com/miguelhincapie/CustomBottomSheetBehavior
  */
 public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends CoordinatorLayout.Behavior<V> {
 
@@ -115,7 +117,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     private int mMaxOffset;
 
     private static final int DEFAULT_ANCHOR_POINT = 700;
-    public int mAnchorPoint;
+    private int mAnchorPoint;
 
     private boolean mHideable;
 
@@ -464,6 +466,30 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
      */
     public final int getPeekHeight() {
         return mPeekHeight;
+    }
+
+    public void setAnchorPoint(int anchorPoint) {
+        mAnchorPoint = anchorPoint;
+//        if (mViewRef == null)
+//            return;
+//        V child = mViewRef.get();
+//        if (child == null)
+//            return;
+//        mMinOffset = Math.max(0, mParentHeight - child.getHeight());
+//        mMaxOffset = Math.max(mParentHeight - mPeekHeight, mMinOffset);
+//
+//        if (mState == STATE_ANCHOR_POINT) {
+//            ViewCompat.offsetTopAndBottom(child, mAnchorPoint);
+//        } else if (mState == STATE_EXPANDED) {
+//            ViewCompat.offsetTopAndBottom(child, mMinOffset);
+//        } else if (mHideable && mState == STATE_HIDDEN) {
+//            ViewCompat.offsetTopAndBottom(child, mParentHeight);
+//        } else if (mState == STATE_COLLAPSED) {
+//            ViewCompat.offsetTopAndBottom(child, mMaxOffset);
+//        }
+    }
+    public int getAnchorPoint(){
+        return mAnchorPoint;
     }
 
     /**

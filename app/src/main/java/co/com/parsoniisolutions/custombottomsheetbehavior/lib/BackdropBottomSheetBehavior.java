@@ -1,10 +1,13 @@
 package co.com.parsoniisolutions.custombottomsheetbehavior.lib;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.lang.ref.WeakReference;
 
 /**
  ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +21,8 @@ import android.view.View;
  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
+ ~
+ ~ https://github.com/miguelhincapie/CustomBottomSheetBehavior
  */
 
 /**
@@ -37,7 +42,7 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * get changed dynamically we get the {@link NestedScrollView} that has
      * "app:layout_behavior=" {@link BottomSheetBehaviorGoogleMapsLike} inside the {@link CoordinatorLayout}
      */
-    private BottomSheetBehaviorGoogleMapsLike mBottomSheetBehavior;
+    private WeakReference<BottomSheetBehaviorGoogleMapsLike> mBottomSheetBehaviorRef;
     /**
      * Following {@link #onDependentViewChanged}'s docs mCurrentChildY just save the child Y
      * position.
@@ -50,7 +55,14 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        return dependency instanceof NestedScrollView;
+        if (dependency instanceof NestedScrollView) {
+            try {
+                BottomSheetBehaviorGoogleMapsLike.from(dependency);
+                return true;
+            }
+            catch (IllegalArgumentException e){}
+        }
+        return false;
     }
 
     @Override
@@ -61,13 +73,13 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
          * value changes throught the time, I mean, you can have a {@link android.widget.ImageView}
          * using images with different sizes and you don't want to resize them or so
          */
-        if (mBottomSheetBehavior == null)
+        if (mBottomSheetBehaviorRef == null || mBottomSheetBehaviorRef.get() == null)
             getBottomSheetBehavior(parent);
         /**
          * mCollapsedY: Y position in where backdrop get hidden behind dependency.
          * {@link BottomSheetBehaviorGoogleMapsLike#getPeekHeight()} and collapsedY are the same point on screen.
          */
-        int collapsedY = dependency.getHeight() - mBottomSheetBehavior.getPeekHeight();
+        int collapsedY = dependency.getHeight() - mBottomSheetBehaviorRef.get().getPeekHeight();
         /**
          * achorPointY: with top being Y=0, achorPointY defines the point in Y where could
          * happen 2 things:
@@ -93,7 +105,7 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Look into the CoordiantorLayout for the {@link BottomSheetBehaviorGoogleMapsLike}
      * @param coordinatorLayout with app:layout_behavior= {@link BottomSheetBehaviorGoogleMapsLike}
      */
-    private void getBottomSheetBehavior(CoordinatorLayout coordinatorLayout) {
+    private void getBottomSheetBehavior(@NonNull CoordinatorLayout coordinatorLayout) {
 
         for (int i = 0; i < coordinatorLayout.getChildCount(); i++) {
             View child = coordinatorLayout.getChildAt(i);
@@ -101,7 +113,8 @@ public class BackdropBottomSheetBehavior<V extends View> extends CoordinatorLayo
             if (child instanceof NestedScrollView) {
 
                 try {
-                    mBottomSheetBehavior = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    BottomSheetBehaviorGoogleMapsLike temp = BottomSheetBehaviorGoogleMapsLike.from(child);
+                    mBottomSheetBehaviorRef = new WeakReference<>(temp);
                     break;
                 }
                 catch (IllegalArgumentException e){}
