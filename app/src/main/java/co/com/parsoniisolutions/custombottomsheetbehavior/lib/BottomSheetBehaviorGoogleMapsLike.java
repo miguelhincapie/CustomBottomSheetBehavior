@@ -420,7 +420,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
              * New behavior
              */
             int currentTop = child.getTop();
-            if (currentTop > mAnchorPoint*1.5 ) { // Multiply by 1.5 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.         
+            if (currentTop > mAnchorPoint*1.25 ) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.         
                 top = mMaxOffset;
                 targetState = STATE_COLLAPSED;
             }
