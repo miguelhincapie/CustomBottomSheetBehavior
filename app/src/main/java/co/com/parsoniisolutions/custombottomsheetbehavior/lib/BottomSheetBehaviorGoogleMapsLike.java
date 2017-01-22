@@ -13,6 +13,7 @@ import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -108,12 +109,12 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
 
     private static final float HIDE_FRICTION = 0.1f;
 
+    private float mMinimumVelocity;
     private float mMaximumVelocity;
 
     private int mPeekHeight;
 
     private int mMinOffset;
-
     private int mMaxOffset;
 
     private static final int DEFAULT_ANCHOR_POINT = 700;
@@ -122,13 +123,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     private boolean mHideable;
 
     @State
-    private int mState = STATE_COLLAPSED;
+    private int mState = STATE_ANCHOR_POINT;
+    @State
+    private int mLastStableState = STATE_ANCHOR_POINT;
 
     private ViewDragHelper mViewDragHelper;
 
     private boolean mIgnoreEvents;
-
-    private int mLastNestedScrollDy;
 
     private boolean mNestedScrolled;
 
@@ -181,6 +182,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
 
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
+        mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
     }
 
     @Override
@@ -201,7 +203,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     }
 
     @Override
-    public boolean onLayoutChild(CoordinatorLayout parent, V child, int layoutDirection) {
+    public boolean onLayoutChild( CoordinatorLayout parent, V child, int layoutDirection ) {
         // First let the parent lay it out
         if (mState != STATE_DRAGGING && mState != STATE_SETTLING) {
             if (ViewCompat.getFitsSystemWindows(parent) &&
@@ -325,23 +327,34 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     }
 
     @Override
-    public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, V child,
-                                       View directTargetChild, View target, int nestedScrollAxes) {
-        mLastNestedScrollDy = 0;
+    public boolean onStartNestedScroll( CoordinatorLayout coordinatorLayout, V child,
+                                       View directTargetChild, View target, int nestedScrollAxes ) {
         mNestedScrolled = false;
         return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
 
     @Override
-    public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V child, View target, int dx,
-                                  int dy, int[] consumed) {
+    public void onNestedPreScroll( CoordinatorLayout coordinatorLayout, V child, View target, int dx, int dy, int[] consumed ) {
         View scrollingChild = mNestedScrollingChildRef.get();
         if (target != scrollingChild) {
             return;
         }
         int currentTop = child.getTop();
         int newTop = currentTop - dy;
-        if (dy > 0) { // Upward
+
+        // Force stop at the anchor - do not go from collapsed to expanded in one scroll
+        if (
+                ( mLastStableState == STATE_COLLAPSED  &&  newTop < mAnchorPoint )  ||
+                ( mLastStableState == STATE_EXPANDED   &&  newTop > mAnchorPoint )
+           ) {
+            consumed[1] = dy;
+            ViewCompat.offsetTopAndBottom( child, mAnchorPoint - currentTop );
+            dispatchOnSlide( child.getTop() );
+            mNestedScrolled = true;
+            return;
+        }
+
+        if ( dy > 0 ) { // Upward
             if (newTop < mMinOffset) {
                 consumed[1] = currentTop - mMinOffset;
                 ViewCompat.offsetTopAndBottom(child, -consumed[1]);
@@ -365,75 +378,90 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             }
         }
         dispatchOnSlide(child.getTop());
-        mLastNestedScrollDy = dy;
         mNestedScrolled = true;
     }
 
     @Override
-    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, V child, View target) {
-        if (child.getTop() == mMinOffset) {
-            setStateInternal(STATE_EXPANDED);
+    public void onStopNestedScroll( CoordinatorLayout coordinatorLayout, V child, View target ) {
+
+        if ( child.getTop() == mMinOffset ) {
+            setStateInternal( STATE_EXPANDED );
+            mLastStableState = STATE_EXPANDED;
             return;
         }
-        if (target != mNestedScrollingChildRef.get() || !mNestedScrolled) {
+        if ( target != mNestedScrollingChildRef.get()  ||  ! mNestedScrolled ) {
             return;
         }
         int top;
         int targetState;
-        if (mLastNestedScrollDy > 0) {
-            /**
-             * Old behavior
-             */
-//            top = mMinOffset;
-//            targetState = STATE_EXPANDED;
-            /**
-             * New behavior
-             */
-            int currentTop = child.getTop();
-            if (currentTop > mAnchorPoint) {
+
+        // Are we flinging up?
+        float yVelocity = getYVelocity();
+        if ( yVelocity < -mMinimumVelocity) {
+            if ( mLastStableState == STATE_COLLAPSED ) {
+                // Fling to anchor
                 top = mAnchorPoint;
                 targetState = STATE_ANCHOR_POINT;
             }
+            else
+            if ( mLastStableState == STATE_ANCHOR_POINT ) {
+                // Fling to expanded
+                top = mMinOffset;
+                targetState = STATE_EXPANDED;
+            }
             else {
+                // We are already expanded
                 top = mMinOffset;
                 targetState = STATE_EXPANDED;
             }
-        } else if (mHideable && shouldHide(child, getYVelocity())) {
-            top = mParentHeight;
-            targetState = STATE_HIDDEN;
-        } else if (mLastNestedScrollDy == 0) {
+        }
+        else
+        // Are we flinging down?
+        if ( yVelocity > mMinimumVelocity ) {
+            if ( mLastStableState == STATE_EXPANDED ) {
+                // Fling to anchor
+                top = mAnchorPoint;
+                targetState = STATE_ANCHOR_POINT;
+            }
+            else
+            if ( mLastStableState == STATE_ANCHOR_POINT ) {
+                // Fling to collapsed
+                top = mMaxOffset;
+                targetState = STATE_COLLAPSED;
+            }
+            else {
+                // We are already collapsed
+                top = mMaxOffset;
+                targetState = STATE_COLLAPSED;
+            }
+        }
+        // Not flinging, just settle to the nearest state
+        else {
+            // Collapse?
             int currentTop = child.getTop();
-            if (Math.abs(currentTop - mMinOffset) < Math.abs(currentTop - mMaxOffset)) {
+            if ( currentTop > mAnchorPoint * 1.25 ) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.
+                top = mMaxOffset;
+                targetState = STATE_COLLAPSED;
+            }
+            // Expand?
+            else
+            if ( currentTop < mAnchorPoint * 0.5 ) {
                 top = mMinOffset;
                 targetState = STATE_EXPANDED;
-            } else {
-                top = mMaxOffset;
-                targetState = STATE_COLLAPSED;
             }
-        } else {
-            /**
-             * Old behavior
-             */
-//            top = mMaxOffset;
-//            targetState = STATE_COLLAPSED;
-            /**
-             * New behavior
-             */
-            int currentTop = child.getTop();
-            if (currentTop > mAnchorPoint*1.25 ) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.         
-                top = mMaxOffset;
-                targetState = STATE_COLLAPSED;
-            }
+            // Snap back to the anchor
             else {
                 top = mAnchorPoint;
                 targetState = STATE_ANCHOR_POINT;
             }
         }
-        if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
-            setStateInternal(STATE_SETTLING);
-            ViewCompat.postOnAnimation(child, new SettleRunnable(child, targetState));
+
+        mLastStableState = targetState;
+        if ( mViewDragHelper.smoothSlideViewTo( child, child.getLeft(), top ) ) {
+            setStateInternal( STATE_SETTLING );
+            ViewCompat.postOnAnimation( child, new SettleRunnable( child, targetState ) );
         } else {
-            setStateInternal(targetState);
+            setStateInternal( targetState );
         }
         mNestedScrolled = false;
     }
@@ -470,23 +498,6 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
 
     public void setAnchorPoint(int anchorPoint) {
         mAnchorPoint = anchorPoint;
-//        if (mViewRef == null)
-//            return;
-//        V child = mViewRef.get();
-//        if (child == null)
-//            return;
-//        mMinOffset = Math.max(0, mParentHeight - child.getHeight());
-//        mMaxOffset = Math.max(mParentHeight - mPeekHeight, mMinOffset);
-//
-//        if (mState == STATE_ANCHOR_POINT) {
-//            ViewCompat.offsetTopAndBottom(child, mAnchorPoint);
-//        } else if (mState == STATE_EXPANDED) {
-//            ViewCompat.offsetTopAndBottom(child, mMinOffset);
-//        } else if (mHideable && mState == STATE_HIDDEN) {
-//            ViewCompat.offsetTopAndBottom(child, mParentHeight);
-//        } else if (mState == STATE_COLLAPSED) {
-//            ViewCompat.offsetTopAndBottom(child, mMaxOffset);
-//        }
     }
     public int getAnchorPoint(){
         return mAnchorPoint;
