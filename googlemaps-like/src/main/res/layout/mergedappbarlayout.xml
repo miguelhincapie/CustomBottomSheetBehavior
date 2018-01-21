@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--If we let an AppBarLayout as root the heirarchy view will have 2 AppBarLayouts, using merge
+we fix that but we need to take care about params in merge because it doesn't add them to the
+xml tree. More info in the following link to understand why use merge instead AppBarLayout.
+http://trickyandroid.com/protip-inflating-layout-for-your-custom-view/
+
+Some params are left in where you use the <MergedAppBarLayout> tag and others are setted in
+MergedAppBarLayout.java init() method-->
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/merged_appbarlayout">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <View
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/colorPrimary"
+            android:layout_gravity="bottom"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/expanded_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextColor="@android:color/white"
+            app:title="@string/key_binding_default_toolbar_name"
+            app:navigationIcon="@drawable/ic_close_white_24dp"/>
+    </FrameLayout>
+</merge>

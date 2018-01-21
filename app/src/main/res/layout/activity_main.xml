@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".sample.MainActivity">
+    tools:context="com.mahc.custombottomsheet.MainActivity">
 
     <FrameLayout
         android:id="@+id/dummy_framelayout_replacing_map"
@@ -71,32 +71,13 @@
         android:src="@drawable/ic_action_go"
         android:layout_margin="@dimen/fab_margin"
         app:layout_behavior="@string/ScrollAwareFABBehavior"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:focusable="true"/>
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/merged_appbarlayout"
+    <com.mahc.custombottomsheetbehavior.MergedAppBarLayout
+        android:id="@+id/mergedappbarlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:tag="modal-appbar"
-        app:layout_behavior="@string/MergedAppBarLayoutBehavior">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <View
-                android:id="@+id/background"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/colorPrimary"
-                android:layout_gravity="bottom"/>
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/expanded_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:title="@string/key_binding_default_toolbar_name"
-                app:navigationIcon="@drawable/ic_close_white_24dp"/>
-        </FrameLayout>
-    </android.support.design.widget.AppBarLayout>
+        app:layout_behavior="@string/MergedAppBarLayoutBehavior"/>
+
 </android.support.design.widget.CoordinatorLayout>

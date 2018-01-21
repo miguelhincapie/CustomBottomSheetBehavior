@@ -1,0 +1,142 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+// load properties
+Properties properties = new Properties()
+File localPropertiesFile = project.file("local.properties")
+if(localPropertiesFile.exists()){
+    properties.load(localPropertiesFile.newDataInputStream())
+}
+File projectPropertiesFile = project.file("project.properties")
+if(projectPropertiesFile.exists()){
+    properties.load(projectPropertiesFile.newDataInputStream())
+}
+
+//read properties
+def projectName = properties.getProperty("project.name")
+def projectGroupId = properties.getProperty("project.groupId")
+def projectArtifactId = properties.getProperty("project.artifactId")
+def projectVersionName = android.defaultConfig.versionName
+def projectPackaging = properties.getProperty("project.packaging")
+def projectSiteUrl = properties.getProperty("project.siteUrl")
+def projectGitUrl = properties.getProperty("project.gitUrl")
+def projectIssueTrackerUrl = properties.getProperty("project.issueTrackerUrl")
+def projectDescription = properties.getProperty("project.description")
+
+def developerId = properties.getProperty("developer.id")
+def developerName = properties.getProperty("developer.name")
+def developerEmail = properties.getProperty("developer.email")
+
+def bintrayUser = properties.getProperty("bintray.user")
+def bintrayApikey = properties.getProperty("bintray.apikey")
+
+def javadocName = properties.getProperty("javadoc.name")
+
+group = projectGroupId
+
+bintray {
+    user = bintrayUser
+    key = bintrayApikey
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = projectName
+        desc = projectDescription
+        websiteUrl = projectSiteUrl
+        vcsUrl = projectGitUrl
+        issueTrackerUrl = projectIssueTrackerUrl
+        licenses = ['Apache-2.0']
+        labels = ['android', 'library', 'bottomSheet', 'CoordinatorLayout.Behavior', 'googleMaps-like']
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            name = projectVersionName
+            desc = 'Beta version'
+            released  = new Date()
+            vcsTag = projectVersionName
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                name projectName
+                groupId projectGroupId
+                artifactId projectArtifactId
+                version projectVersionName
+                packaging projectPackaging
+                url projectSiteUrl
+                description projectDescription
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection projectGitUrl
+                    developerConnection projectGitUrl
+                    url projectSiteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+// Add compile dependencies to javadoc
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompiler.classpath.files
+    })
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+// javadoc configuration
+javadoc {
+    options{
+        encoding 'UTF-8'
+        charSet 'UTF-8'
+        author true
+        version projectVersionName
+        links 'http://docs.oracle.com/javase/7/docs/api'
+        title javadocName
+    }
+}
+
+////added to avoid errors related to unknown tags in javadoc
+//tasks.withType(Javadoc) {
+//    options.addStringOption('Xdoclint:none', '-quiet')
+//    options.addStringOption('encoding', 'UTF-8')
+//    options.addStringOption('charSet', 'UTF-8')
+//}
+
+javadoc {
+    options.tags = [ "attr", "hide" ]
+}
