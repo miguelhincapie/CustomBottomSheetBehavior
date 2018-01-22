@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/CustomBottomSheetBehavior.iml" filepath="$PROJECT_DIR$/.idea/CustomBottomSheetBehavior.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\miguel.hincapie\Documents\AndroidStudioProjects\CustomBottomSheetBehavior\googlemaps-like\app.iml" filepath="C:\Users\miguel.hincapie\Documents\AndroidStudioProjects\CustomBottomSheetBehavior\googlemaps-like\app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/googlemaps-like/googlemaps-like.iml" filepath="$PROJECT_DIR$/googlemaps-like/googlemaps-like.iml" />
+    </modules>
+  </component>
+</project>

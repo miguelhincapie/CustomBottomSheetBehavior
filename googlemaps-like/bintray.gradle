@@ -7,9 +7,15 @@ File localPropertiesFile = project.file("local.properties")
 if(localPropertiesFile.exists()){
     properties.load(localPropertiesFile.newDataInputStream())
 }
+else {
+    throw new GradleException("local.properties file doesn't exist")
+}
 File projectPropertiesFile = project.file("project.properties")
 if(projectPropertiesFile.exists()){
     properties.load(projectPropertiesFile.newDataInputStream())
+}
+else {
+    throw new GradleException("project.properties file doesn't exist")
 }
 
 //read properties
@@ -33,6 +39,7 @@ def bintrayApikey = properties.getProperty("bintray.apikey")
 def javadocName = properties.getProperty("javadoc.name")
 
 group = projectGroupId
+version = projectVersionName
 
 bintray {
     user = bintrayUser
@@ -60,33 +67,31 @@ bintray {
 
 install {
     repositories.mavenInstaller {
-        pom {
-            project {
-                name projectName
-                groupId projectGroupId
-                artifactId projectArtifactId
-                version projectVersionName
-                packaging projectPackaging
+        pom.project {
+            name projectName
+            groupId projectGroupId
+            artifactId projectArtifactId
+            version projectVersionName
+            packaging projectPackaging
+            url projectSiteUrl
+            description projectDescription
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id developerId
+                    name developerName
+                    email developerEmail
+                }
+            }
+            scm {
+                connection projectGitUrl
+                developerConnection projectGitUrl
                 url projectSiteUrl
-                description projectDescription
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id developerId
-                        name developerName
-                        email developerEmail
-                    }
-                }
-                scm {
-                    connection projectGitUrl
-                    developerConnection projectGitUrl
-                    url projectSiteUrl
-                }
             }
         }
     }
@@ -136,7 +141,7 @@ javadoc {
 //    options.addStringOption('encoding', 'UTF-8')
 //    options.addStringOption('charSet', 'UTF-8')
 //}
-
+//but better I defined the tags
 javadoc {
     options.tags = [ "attr", "hide" ]
 }

@@ -5,11 +5,10 @@ android {
     buildToolsVersion "26.0.2"
 
     defaultConfig {
-//        applicationId "com.mahc.custombottomsheetbehavior"
         minSdkVersion 17
         targetSdkVersion 26
         versionCode 1
-        versionName "0.9.0"
+        versionName "0.9.1"
     }
     buildTypes {
         release {
@@ -25,4 +24,4 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
 }
 
-apply from: 'bintrayUpload.gradle'
+apply from: 'bintray.gradle'
