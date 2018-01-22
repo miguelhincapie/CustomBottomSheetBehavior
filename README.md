@@ -1,6 +1,8 @@
 # CustomBottomSheetBehavior like Google Maps for Android
 Android Studio Project using Support Library focused on get Google Maps 3 states behavior including background image parallax and toolbars animations.
 
+[ ![Download](https://api.bintray.com/packages/mahc/maven/CustomBottomSheetBehavior/images/download.svg) ](https://bintray.com/mahc/maven/CustomBottomSheetBehavior/_latestVersion)
+
 ## Example
 [![CustomBottomSheetBehavior](https://raw.githubusercontent.com/akan44/CustomBottomSheetBehavior/master/CustomBottomSheetBehaviorLikeGoogleMaps3states.gif)]
 
