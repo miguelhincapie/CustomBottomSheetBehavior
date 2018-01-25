@@ -13,7 +13,7 @@ dependencies {
 ## Usage
 [![CustomBottomSheetBehavior](https://raw.githubusercontent.com/akan44/CustomBottomSheetBehavior/master/CustomBottomSheetBehaviorLikeGoogleMaps3states.gif)]<br><br>
 
-In a nearly future I'm going to create a wiki explaining how to use, until then take a look at the example (app module).<br><br>
+[Wiki under construction](https://github.com/miguelhincapie/CustomBottomSheetBehavior/wiki) but still with some info already, until I complete it you can take a look at the example (app module).<br><br>
 Check the following files
 ```
 activity_main.xml  (is like a template)
@@ -59,7 +59,8 @@ Related questions:<br>
 [BottomSheetDialogFragment - How to set expanded height (or min top offset)](http://stackoverflow.com/questions/36030879/bottomsheetdialogfragment-how-to-set-expanded-height-or-min-top-offset)
 
 ## Credits
-Giving thx to @akaN44 and @vit001 for their contribution :D.
+* [Paul-Marie Tetedoie](https://github.com/akaN44)
+* [Vit Hradecky](https://github.com/vit001)
 
 ## License
 Licensed under the Apache License, Version 2.0
