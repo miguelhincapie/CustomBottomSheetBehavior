@@ -101,6 +101,8 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
 
     private boolean mHideable;
 
+    private int[] mIgnoreStates;
+
     @State
     private int mState = STATE_ANCHOR_POINT;
     @State
@@ -144,6 +146,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
         setPeekHeight(a.getDimensionPixelSize(
                 android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, 0));
         setHideable(a.getBoolean(android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
+        setIgnoreStates(null);
         a.recycle();
 
         /**
@@ -525,6 +528,26 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
      */
     public boolean isHideable() {
         return mHideable;
+    }
+
+    /**
+     * Sets whether some states should be skipped.
+     *
+     * @param hideable {@code true} to make this bottom sheet hideable.
+     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Params_behavior_hideable
+     */
+    public void setIgnoreStates(int[] ignoreStates) {
+        mIgnoreStates = ignoreStates;
+    }
+
+    /**
+     * Gets whether some states should be skipped.
+     *
+     * @return {@code true} if this bottom sheet can hide.
+     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Params_behavior_hideable
+     */
+    public int[] getIgnoreStates() {
+        return mIgnoreStates;
     }
 
     /**
