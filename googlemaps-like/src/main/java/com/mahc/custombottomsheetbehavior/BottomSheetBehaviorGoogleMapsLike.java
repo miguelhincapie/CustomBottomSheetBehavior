@@ -7,7 +7,6 @@ import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
@@ -182,9 +181,9 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     public boolean onLayoutChild( CoordinatorLayout parent, V child, int layoutDirection ) {
         // First let the parent lay it out
         if (mState != STATE_DRAGGING && mState != STATE_SETTLING) {
-            if (ViewCompat.getFitsSystemWindows(parent) &&
-                    !ViewCompat.getFitsSystemWindows(child)) {
-                ViewCompat.setFitsSystemWindows(child, true);
+            if (parent.getFitsSystemWindows() &&
+                    !child.getFitsSystemWindows()) {
+                child.setFitsSystemWindows(true);
             }
             parent.onLayoutChild(child, layoutDirection);
         }
@@ -216,10 +215,11 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     @Override
     public boolean onInterceptTouchEvent( CoordinatorLayout parent, V child, MotionEvent event ) {
         if ( ! child.isShown() ) {
+            mIgnoreEvents = true;
             return false;
         }
 
-        int action = MotionEventCompat.getActionMasked( event );
+        int action = event.getActionMasked();
         if ( action == MotionEvent.ACTION_DOWN ) {
             reset();
         }
@@ -236,6 +236,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
+                mScrollVelocityTracker.clear();
                 int initialX = (int) event.getX();
                 mInitialY = (int) event.getY();
                 if(mState == STATE_ANCHOR_POINT){
@@ -253,11 +254,6 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
-        }
-
-        if ( action == MotionEvent.ACTION_CANCEL ) {
-            // We don't want to trigger a BottomSheet fling as a result of a Cancel MotionEvent (e.g., parent horizontal scroll view taking over touch events)
-            mScrollVelocityTracker.clear();
         }
 
         if ( ! mIgnoreEvents  &&  mViewDragHelper.shouldInterceptTouchEvent( event ) ) {
@@ -280,12 +276,14 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             return false;
         }
 
-        int action = MotionEventCompat.getActionMasked( event );
+        int action = event.getActionMasked();
         if ( mState == STATE_DRAGGING  &&  action == MotionEvent.ACTION_DOWN ) {
             return true;
         }
 
-        mViewDragHelper.processTouchEvent( event );
+        if (mViewDragHelper != null) {
+            mViewDragHelper.processTouchEvent(event);
+        }
 
         if ( action == MotionEvent.ACTION_DOWN ) {
             reset();
@@ -302,7 +300,9 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     }
 
     @Override
-    public boolean onStartNestedScroll( CoordinatorLayout coordinatorLayout, V child, View directTargetChild, View target, int nestedScrollAxes ) {
+    public boolean onStartNestedScroll( CoordinatorLayout coordinatorLayout, V child,
+                                        View directTargetChild, View target, int nestedScrollAxes,
+                                        @ViewCompat.NestedScrollType int type) {
         mNestedScrolled = false;
         return ( nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL ) != 0;
     }
@@ -334,7 +334,9 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     }
 
     @Override
-    public void onNestedPreScroll( CoordinatorLayout coordinatorLayout, V child, View target, int dx, int dy, int[] consumed ) {
+    public void onNestedPreScroll( CoordinatorLayout coordinatorLayout, V child, View target,
+                                   int dx, int dy, int[] consumed,
+                                   @ViewCompat.NestedScrollType int type) {
         View scrollingChild = mNestedScrollingChildRef.get();
         if ( target != scrollingChild ) {
             return;
@@ -387,7 +389,8 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     }
 
     @Override
-    public void onStopNestedScroll( CoordinatorLayout coordinatorLayout, V child, View target ) {
+    public void onStopNestedScroll( CoordinatorLayout coordinatorLayout, V child, View target,
+                                    @ViewCompat.NestedScrollType int type) {
         if ( child.getTop() == mMinOffset ) {
             setStateInternal( STATE_EXPANDED );
             mLastStableState = STATE_EXPANDED;
@@ -666,7 +669,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             }
             if ( mState == STATE_EXPANDED  &&  mActivePointerId == pointerId ) {
                 View scroll = mNestedScrollingChildRef.get();
-                if (scroll != null && ViewCompat.canScrollVertically(scroll, -1)) {
+                if (scroll != null && scroll.canScrollVertically(-1)) {
                     // Let the content scroll up
                     return false;
                 }

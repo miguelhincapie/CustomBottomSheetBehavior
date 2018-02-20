@@ -26,6 +26,15 @@ allprojects {
     }
 }
 
+ext {
+    compileSdkVersion = 27
+    targetSdkVersion = 26
+    minSdkVersion = 17
+
+    supportVersion = '27.0.2'
+    bottomSheetVersion = '0.9.1'
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
