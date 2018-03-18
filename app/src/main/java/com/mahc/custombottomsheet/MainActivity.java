@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         mergedAppBarLayoutBehavior.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                behavior.setState(BottomSheetBehaviorGoogleMapsLike.STATE_COLLAPSED);
+                behavior.setState(BottomSheetBehaviorGoogleMapsLike.STATE_ANCHOR_POINT);
             }
         });
 
@@ -95,5 +95,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         behavior.setState(BottomSheetBehaviorGoogleMapsLike.STATE_ANCHOR_POINT);
+        //behavior.setCollapsible(false);
     }
 }
