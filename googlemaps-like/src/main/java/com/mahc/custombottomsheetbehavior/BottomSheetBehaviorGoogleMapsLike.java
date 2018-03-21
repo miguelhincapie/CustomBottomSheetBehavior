@@ -239,6 +239,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
+                mScrollVelocityTracker.clear();
                 int initialX = (int) event.getX();
                 mInitialY = (int) event.getY();
                 if(mState == STATE_ANCHOR_POINT){
@@ -290,7 +291,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 return false;
             }
         }
-
+  
         if (mViewDragHelper != null) {
             mViewDragHelper.processTouchEvent(event);
         }
