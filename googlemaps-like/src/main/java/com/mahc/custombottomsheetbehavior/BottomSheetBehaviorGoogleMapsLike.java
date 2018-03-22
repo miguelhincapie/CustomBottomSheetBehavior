@@ -100,6 +100,8 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
 
     private boolean mHideable;
 
+    private boolean mCollapsible;
+
     @State
     private int mState = STATE_ANCHOR_POINT;
     @State
@@ -149,6 +151,7 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
          * Getting the anchorPoint...
          */
         mAnchorPoint = DEFAULT_ANCHOR_POINT;
+        mCollapsible = true;
         a = context.obtainStyledAttributes(attrs, R.styleable.CustomBottomSheetBehavior);
         if (attrs != null)
             mAnchorPoint = (int) a.getDimension( R.styleable.CustomBottomSheetBehavior_anchorPoint, 0);
@@ -281,6 +284,14 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             return true;
         }
 
+        // Detect scroll direction for ignoring collapsible
+        if(mLastStableState == STATE_ANCHOR_POINT && action==MotionEvent.ACTION_MOVE) {
+            if(event.getY()>mInitialY && !mCollapsible) {
+                reset();
+                return false;
+            }
+        }
+  
         if (mViewDragHelper != null) {
             mViewDragHelper.processTouchEvent(event);
         }
@@ -369,14 +380,15 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 ViewCompat.offsetTopAndBottom( child, -dy );
                 setStateInternal( STATE_DRAGGING );
             }
-        }
-        else
-        if ( dy < 0 ) { // Downward
-            if ( ! ViewCompat.canScrollVertically(target, -1) ) {
-                if ( newTop <= mMaxOffset || mHideable ) {
-                    consumed[1] = dy;
-                    ViewCompat.offsetTopAndBottom(child, -dy);
-                    setStateInternal(STATE_DRAGGING);
+        } else if (dy < 0) { // Downward
+            if (!ViewCompat.canScrollVertically(target, -1)) {
+                if (newTop <= mMaxOffset || mHideable) {
+                    // Restrict STATE_COLLAPSED if restrictedState is set
+                    if(mCollapsible==true || (mCollapsible==false && (mAnchorPoint - newTop)>=0)) {
+                        consumed[1] = dy;
+                        ViewCompat.offsetTopAndBottom(child, -dy);
+                        setStateInternal(STATE_DRAGGING);
+                    }
                 } else {
                     consumed[1] = currentTop - mMaxOffset;
                     ViewCompat.offsetTopAndBottom(child, -consumed[1]);
@@ -430,23 +442,26 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                     top = mAnchorPoint;
                     targetState = STATE_ANCHOR_POINT;
                 }
-                else
-                if ( mLastStableState == STATE_ANCHOR_POINT ) {
-                    // Fling from anchor to collapsed
-                    top = mMaxOffset;
-                    targetState = STATE_COLLAPSED;
-                }
-                else {
-                    // We are already collapsed
-                    top = mMaxOffset;
-                    targetState = STATE_COLLAPSED;
+                else if(mCollapsible==true) {
+                    if (mLastStableState == STATE_ANCHOR_POINT) {
+                        // Fling from anchor to collapsed
+                        top = mMaxOffset;
+                        targetState = STATE_COLLAPSED;
+                    } else {
+                        // We are already collapsed
+                        top = mMaxOffset;
+                        targetState = STATE_COLLAPSED;
+                    }
+                } else {
+                    top = mAnchorPoint;
+                    targetState = STATE_ANCHOR_POINT;
                 }
             }
             // Not flinging, just settle to the nearest state
             else {
                 // Collapse?
                 int currentTop = child.getTop();
-                if ( currentTop > mAnchorPoint * 1.25 ) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.
+                if ( currentTop > mAnchorPoint * 1.25 && mCollapsible==true) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.
                     top = mMaxOffset;
                     targetState = STATE_COLLAPSED;
                 }
@@ -528,6 +543,26 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
      */
     public boolean isHideable() {
         return mHideable;
+    }
+
+    /**
+     * Sets whether some states should be skipped.
+     *
+     * @param collapsible {@code true} to make this bottom sheet hideable.
+     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Params_behavior_hideable
+     */
+    public void setCollapsible(boolean collapsible) {
+        mCollapsible = collapsible;
+    }
+
+    /**
+     * Gets whether some states should be skipped.
+     *
+     * @return {@code true} if this bottom sheet can hide.
+     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Params_behavior_hideable
+     */
+    public boolean isCollapsible() {
+        return mCollapsible;
     }
 
     /**
@@ -716,6 +751,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 top = mMaxOffset;
                 targetState = STATE_COLLAPSED;
             }
+
+            // Restrict Collapsed view (optional)
+            if(!mCollapsible && targetState==STATE_COLLAPSED) {
+                top = mAnchorPoint;
+                targetState = STATE_ANCHOR_POINT;
+            }
+
             if ( mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top) ) {
                 setStateInternal(STATE_SETTLING);
                 ViewCompat.postOnAnimation(releasedChild,
