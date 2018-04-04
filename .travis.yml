@@ -1,0 +1,98 @@
+language: android
+sudo: required
+jdk: oraclejdk8
+
+before_cache:
+ - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+ - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+ directories:
+ - $HOME/.gradle/caches/
+ - $HOME/.gradle/wrapper/
+ - $HOME/.android/build-cache
+
+env:
+ global:
+ - ANDROID_API=25
+ - EMULATOR_API=26
+ - ANDROID_BUILD_TOOLS=27.0.2
+ - ADB_INSTALL_TIMEOUT=5 # minutes
+ - secure: "xxx"
+ - secure: "xxx"
+
+android:
+ components:
+ - tools
+ - platform-tools
+ - build-tools-$ANDROID_BUILD_TOOLS
+ - android-$ANDROID_API
+ # Additional components
+ - extra-google-google_play_services # google play services
+ - extra-google-m2repository
+ - extra-android-m2repository # for design library
+ - extra-android-support # Support library
+ - addon-google_apis-google-$ANDROID_API
+ - addon-google_apis-google-$EMULATOR_API
+ # Android emulator system image(s) to be used during tests
+ - sys-img-armeabi-v7a-addon-google_apis-google-$ANDROID_API
+ - sys-img-armeabi-v7a-addon-google_apis-google-$EMULATOR_API
+
+ licenses:
+ - android-sdk-preview-license-.+
+ - android-sdk-license-.+
+ - google-gdk-license-.+
+
+before_install:
+# for Constraint Layout
+#- openssl aes-256-cbc -K $encrypted_c0801aa05af4_key -iv $encrypted_c0801aa05af4_iv -in example_keystore.jks.enc -out example_keystore.jks -d
+# - mkdir "$ANDROID_HOME/licenses" || true
+# - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+# - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+- chmod +x gradlew
+# - ./gradlew dependencies || true # DON'T ADD unless you are getting "Install missing components using SDK manager"
+#Source: https://medium.com/@oldergod/constraint-layout-and-circleci-travis-d50342696d2
+
+# blocklist
+#branches:
+#  except:
+#  - legacy
+#  - experimental
+
+# safelist
+#branches:
+#  only:
+#  - master
+
+before_script:
+- echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
+- emulator -avd test -no-skin -no-audio -no-window &
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
+
+script:
+ - "./gradlew clean build connectedCheck -PdisablePreDex --stacktrace"
+# - ./gradlew clean
+# - ./gradlew assembleDebug
+# - ./gradlew assembleDebugAndroidTest
+
+before_deploy:
+- cp $TRAVIS_BUILD_DIR/example_keystore.jks $HOME
+- cd app/build/outputs/apk/
+- jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $HOME/example_keystore.jks -storepass $storepass -keypass $keypass app-release-unsigned.apk ExampleKeystoreAlias
+
+# Verification
+- jarsigner -verify app-release-unsigned.apk
+- "${ANDROID_HOME}/build-tools/24.0.2/zipalign -v 4 app-release-unsigned.apk TravisExample.apk"
+
+deploy:
+  provider: releases
+  file: TravisExample.apk
+  skip_cleanup: true
+
+  on:
+    repo: harmittaa/travis-example-android
+    tags: true
+    jdk: oraclejdk8
+  api_key:
+    secure: "xxx"
