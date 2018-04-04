@@ -23,4 +23,8 @@ dependencies {
     implementation "com.android.support:design:$rootProject.ext.supportVersion"
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.4.1'
+}
+
 apply from: 'bintray.gradle'
