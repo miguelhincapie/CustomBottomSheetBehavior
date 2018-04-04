@@ -32,7 +32,7 @@ ext {
     minSdkVersion = 17
 
     supportVersion = '27.0.2'
-    bottomSheetVersion = '0.9.1'
+    bottomSheetVersion = '0.9.2'
 }
 
 task clean(type: Delete) {
