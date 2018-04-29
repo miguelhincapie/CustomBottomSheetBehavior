@@ -588,19 +588,17 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
         if ( state == mState ) {
             return;
         }
-        if ( mViewRef == null ) {
-            // The view is not laid out yet; modify mState and let onLayoutChild handle it later
-            /**
-             * New behavior (added: state == STATE_ANCHOR_POINT ||)
-             */
-            if ( state == STATE_COLLAPSED || state == STATE_EXPANDED || state == STATE_ANCHOR_POINT ||
-                    (mHideable && state == STATE_HIDDEN)) {
-                mState = state;
-                mLastStableState = state;
-            }
-            return;
+
+        /**
+         * New behavior (added: state == STATE_ANCHOR_POINT ||)
+         */
+        if ( state == STATE_COLLAPSED || state == STATE_EXPANDED || state == STATE_ANCHOR_POINT ||
+                (mHideable && state == STATE_HIDDEN)) {
+            mState = state;
+            mLastStableState = state;
         }
-        V child = mViewRef.get();
+
+        V child = mViewRef == null ? null : mViewRef.get();
         if (child == null) {
             return;
         }
