@@ -1,25 +1,31 @@
 language: android
-sudo: required
 jdk: oraclejdk8
+sudo: required # false for Container-Based Infrastructure, required for Sudo-enabled Infrastructure
 
 before_cache:
- - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
- - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f ${TRAVIS_BUILD_DIR}/gradle/caches/modules-2/modules-2.lock # Avoid to repack it due locks
+  - rm -f ${TRAVIS_BUILD_DIR}/gradle/caches/3.3/classAnalysis/classAnalysis.lock
+  - rm -f ${TRAVIS_BUILD_DIR}/gradle/caches/3.3/jarSnapshots/jarSnapshots.lock
+#  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/ # from unknown tutorial and no idea if I need it
 
 cache:
- directories:
- - $HOME/.gradle/caches/
- - $HOME/.gradle/wrapper/
- - $HOME/.android/build-cache
+  directories:
+    - ${TRAVIS_BUILD_DIR}/gradle/caches/
+    - ${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/
+    # - $HOME/.gradle/wrapper/ # from unknown tutorial and no idea if I need it
+    # - $HOME/.android/build-cache # from unknown tutorial and no idea if I need it
+
+notifications:
+  email: false
 
 env:
- global:
- - ANDROID_API=25
- - EMULATOR_API=26
- - ANDROID_BUILD_TOOLS=27.0.2
- - ADB_INSTALL_TIMEOUT=5 # minutes
- - secure: "xxx"
- - secure: "xxx"
+  global:
+    - ANDROID_API=25
+    - EMULATOR_API=26
+    - ANDROID_BUILD_TOOLS=27.0.2
+    - ADB_INSTALL_TIMEOUT=5 # minutes
+    - secure: "xxx"
+    - secure: "xxx"
 
 android:
  components:
@@ -71,28 +77,29 @@ before_script:
 - adb shell input keyevent 82 &
 
 script:
- - "./gradlew clean build connectedCheck -PdisablePreDex --stacktrace"
+ - ./gradlew clean build connectedCheck -PdisablePreDex --stacktrace
+ - ./gradlew bintrayupload --info
 # - ./gradlew clean
 # - ./gradlew assembleDebug
 # - ./gradlew assembleDebugAndroidTest
 
-before_deploy:
-- cp $TRAVIS_BUILD_DIR/example_keystore.jks $HOME
-- cd app/build/outputs/apk/
-- jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $HOME/example_keystore.jks -storepass $storepass -keypass $keypass app-release-unsigned.apk ExampleKeystoreAlias
+# before_deploy:
+# - cp $TRAVIS_BUILD_DIR/example_keystore.jks $HOME
+# - cd app/build/outputs/apk/
+# - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $HOME/example_keystore.jks -storepass $storepass -keypass $keypass app-release-unsigned.apk ExampleKeystoreAlias
 
 # Verification
-- jarsigner -verify app-release-unsigned.apk
-- "${ANDROID_HOME}/build-tools/24.0.2/zipalign -v 4 app-release-unsigned.apk TravisExample.apk"
+# - jarsigner -verify app-release-unsigned.apk
+# - "${ANDROID_HOME}/build-tools/24.0.2/zipalign -v 4 app-release-unsigned.apk TravisExample.apk"
 
-deploy:
-  provider: releases
-  file: TravisExample.apk
-  skip_cleanup: true
-
-  on:
-    repo: harmittaa/travis-example-android
-    tags: true
-    jdk: oraclejdk8
-  api_key:
-    secure: "xxx"
+# deploy:
+#  provider: releases
+#  file: TravisExample.apk
+#  skip_cleanup: true
+#
+#  on:
+#    repo: harmittaa/travis-example-android
+#    tags: true
+#    jdk: oraclejdk8
+#  api_key:
+#    secure: "xxx"
