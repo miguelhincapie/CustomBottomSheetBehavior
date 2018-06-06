@@ -292,10 +292,12 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             }
         }
   
-        if (mViewDragHelper != null) {
-            mViewDragHelper.processTouchEvent(event);
+        if (mViewDragHelper == null) {
+            mViewDragHelper = ViewDragHelper.create(parent, mDragCallback);
         }
-
+        
+        mViewDragHelper.processTouchEvent(event);
+        
         if ( action == MotionEvent.ACTION_DOWN ) {
             reset();
         }
