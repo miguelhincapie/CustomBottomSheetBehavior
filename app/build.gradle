@@ -10,7 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
 
@@ -26,13 +26,13 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.supportVersion"
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 
-    implementation "com.android.support:design:$rootProject.ext.supportVersion"
+    implementation "com.google.android.material:material:$rootProject.ext.supportVersion"
 
     implementation project(':googlemaps-like')
 //    implementation "com.mahc.custombottomsheetbehavior:googlemaps-like:$rootProject.ext.bottomSheetVersion"

@@ -19,8 +19,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
-    implementation "com.android.support:design:$rootProject.ext.supportVersion"
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.supportVersion"
+    implementation "com.google.android.material:material:$rootProject.ext.supportVersion"
 }
 
 //task wrapper(type: Wrapper) {
