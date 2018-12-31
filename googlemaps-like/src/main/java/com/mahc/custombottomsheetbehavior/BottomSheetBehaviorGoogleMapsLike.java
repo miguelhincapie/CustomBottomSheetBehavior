@@ -295,13 +295,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 return false;
             }
         }
-  
+
         if (mViewDragHelper == null) {
             mViewDragHelper = ViewDragHelper.create(parent, mDragCallback);
         }
-        
+
         mViewDragHelper.processTouchEvent(event);
-        
+
         if ( action == MotionEvent.ACTION_DOWN ) {
             reset();
         }
@@ -646,6 +646,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     private void setStateInternal(@State int state) {
         if (mState == state) {
             return;
+        }
+        switch (state) {
+            case STATE_ANCHOR_POINT:
+            case STATE_COLLAPSED:
+            case STATE_EXPANDED:
+            case STATE_HIDDEN:
+                mLastStableState = state;
         }
         mState = state;
         View bottomSheet = mViewRef.get();
