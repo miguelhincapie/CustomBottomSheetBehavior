@@ -185,13 +185,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     @Override
     public boolean onLayoutChild( CoordinatorLayout parent, V child, int layoutDirection ) {
         // First let the parent lay it out
-        if (mState != STATE_DRAGGING && mState != STATE_SETTLING) {
-            if (parent.getFitsSystemWindows() &&
-                    !child.getFitsSystemWindows()) {
-                child.setFitsSystemWindows(true);
-            }
-            parent.onLayoutChild(child, layoutDirection);
+        if (parent.getFitsSystemWindows() &&
+                !child.getFitsSystemWindows()) {
+            child.setFitsSystemWindows(true);
         }
+        int savedTop = child.getTop();
+        // First let the parent lay it out
+        parent.onLayoutChild(child, layoutDirection);
         // Offset the bottom sheet
         mParentHeight = parent.getHeight();
         mMinOffset = Math.max(0, mParentHeight - child.getHeight());
@@ -208,12 +208,14 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             ViewCompat.offsetTopAndBottom(child, mParentHeight);
         } else if (mState == STATE_COLLAPSED) {
             ViewCompat.offsetTopAndBottom(child, mMaxOffset);
+        } else if (mState == STATE_DRAGGING || mState == STATE_SETTLING) {
+            ViewCompat.offsetTopAndBottom(child, savedTop - child.getTop());
         }
-        if ( mViewDragHelper == null ) {
-            mViewDragHelper = ViewDragHelper.create( parent, mDragCallback );
+        if (mViewDragHelper == null) {
+            mViewDragHelper = ViewDragHelper.create(parent, mDragCallback);
         }
         mViewRef = new WeakReference<>(child);
-        mNestedScrollingChildRef = new WeakReference<>( findScrollingChild( child ) );
+        mNestedScrollingChildRef = new WeakReference<>(findScrollingChild(child));
         return true;
     }
 
