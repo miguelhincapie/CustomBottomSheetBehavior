@@ -740,23 +740,76 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             int top;
             @State int targetState;
             if ( yvel < 0 ) { // Moving up
-                top = mMinOffset;
-                targetState = STATE_EXPANDED;
+                boolean change = false;
+                if (yvel * -1 > mMinimumVelocity) {
+                    change = true;
+                }
+                if (change) {
+                    switch (mLastStableState) {
+                        case STATE_ANCHOR_POINT:
+                            targetState = STATE_EXPANDED;
+                            break;
+                        case STATE_COLLAPSED:
+                            targetState = STATE_ANCHOR_POINT;
+                            break;
+                        default:
+                            targetState = STATE_ANCHOR_POINT;
+                    }
+                } else {
+                    targetState = mLastStableState;
+                }
+                switch (targetState) {
+                    case STATE_ANCHOR_POINT:
+                        top = mAnchorPoint;
+                        break;
+                    case STATE_COLLAPSED:
+                        top = mMaxOffset;
+                        break;
+                    case STATE_EXPANDED:
+                        top = mMinOffset;
+                        break;
+                    default:
+                        top = mAnchorPoint;
+
+                }
             }
-            else
-            if ( mHideable  &&  shouldHide(releasedChild, yvel) ) {
+            else if ( mHideable  &&  shouldHide(releasedChild, yvel) ) {
                 top = mParentHeight;
                 targetState = STATE_HIDDEN;
             }
             else
             if ( yvel == 0.f ) {
                 int currentTop = releasedChild.getTop();
-                if (Math.abs(currentTop - mMinOffset) < Math.abs(currentTop - mMaxOffset)) {
-                    top = mMinOffset;
-                    targetState = STATE_EXPANDED;
+                int distToBottom = Math.abs(currentTop - mMaxOffset);
+                int distToAnchor = Math.abs(currentTop - mAnchorPoint);
+                int distToTop = Math.abs(currentTop - mMinOffset);
+                if (distToTop < distToBottom) {
+                    if (distToTop < distToAnchor) {
+                        top = mMinOffset;
+                        targetState = STATE_EXPANDED;
+                        // top
+                    } else {
+                        top = mAnchorPoint;
+                        targetState = STATE_ANCHOR_POINT;
+                        // anchor
+                    }
                 } else {
-                    top = mMaxOffset;
-                    targetState = STATE_COLLAPSED;
+                    if (distToBottom < distToAnchor) {
+                        if (distToBottom == 0) {
+                            // handling click on bottom to make it go to anchor point
+                            top = mAnchorPoint;
+                            targetState = STATE_ANCHOR_POINT;
+                        } else {
+                            top = mMaxOffset;
+                            targetState = STATE_COLLAPSED;
+                        }
+
+                        // bottom
+                    } else {
+                        top = mAnchorPoint;
+                        targetState = STATE_ANCHOR_POINT;
+                        // anchor
+                    }
                 }
             } else {
                 top = mMaxOffset;
