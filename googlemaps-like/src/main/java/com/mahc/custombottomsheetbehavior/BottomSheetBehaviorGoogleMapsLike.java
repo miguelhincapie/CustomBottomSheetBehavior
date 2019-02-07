@@ -185,13 +185,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
     @Override
     public boolean onLayoutChild( CoordinatorLayout parent, V child, int layoutDirection ) {
         // First let the parent lay it out
-        if (parent.getFitsSystemWindows() &&
-                !child.getFitsSystemWindows()) {
-            child.setFitsSystemWindows(true);
+        if (mState != STATE_DRAGGING && mState != STATE_SETTLING) {
+            if (parent.getFitsSystemWindows() &&
+                    !child.getFitsSystemWindows()) {
+                child.setFitsSystemWindows(true);
+            }
+            parent.onLayoutChild(child, layoutDirection);
         }
-        int savedTop = child.getTop();
-        // First let the parent lay it out
-        parent.onLayoutChild(child, layoutDirection);
         // Offset the bottom sheet
         mParentHeight = parent.getHeight();
         mMinOffset = Math.max(0, mParentHeight - child.getHeight());
@@ -208,14 +208,12 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             ViewCompat.offsetTopAndBottom(child, mParentHeight);
         } else if (mState == STATE_COLLAPSED) {
             ViewCompat.offsetTopAndBottom(child, mMaxOffset);
-        } else if (mState == STATE_DRAGGING || mState == STATE_SETTLING) {
-            ViewCompat.offsetTopAndBottom(child, savedTop - child.getTop());
         }
-        if (mViewDragHelper == null) {
-            mViewDragHelper = ViewDragHelper.create(parent, mDragCallback);
+        if ( mViewDragHelper == null ) {
+            mViewDragHelper = ViewDragHelper.create( parent, mDragCallback );
         }
         mViewRef = new WeakReference<>(child);
-        mNestedScrollingChildRef = new WeakReference<>(findScrollingChild(child));
+        mNestedScrollingChildRef = new WeakReference<>( findScrollingChild( child ) );
         return true;
     }
 
@@ -295,13 +293,13 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                 return false;
             }
         }
-
+  
         if (mViewDragHelper == null) {
             mViewDragHelper = ViewDragHelper.create(parent, mDragCallback);
         }
-
+        
         mViewDragHelper.processTouchEvent(event);
-
+        
         if ( action == MotionEvent.ACTION_DOWN ) {
             reset();
         }
@@ -655,13 +653,6 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
         if (mState == state) {
             return;
         }
-        switch (state) {
-            case STATE_ANCHOR_POINT:
-            case STATE_COLLAPSED:
-            case STATE_EXPANDED:
-            case STATE_HIDDEN:
-                mLastStableState = state;
-        }
         mState = state;
         View bottomSheet = mViewRef.get();
         if (bottomSheet != null && mCallback != null) {
@@ -748,76 +739,23 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             int top;
             @State int targetState;
             if ( yvel < 0 ) { // Moving up
-                boolean change = false;
-                if (yvel * -1 > mMinimumVelocity) {
-                    change = true;
-                }
-                if (change) {
-                    switch (mLastStableState) {
-                        case STATE_ANCHOR_POINT:
-                            targetState = STATE_EXPANDED;
-                            break;
-                        case STATE_COLLAPSED:
-                            targetState = STATE_ANCHOR_POINT;
-                            break;
-                        default:
-                            targetState = STATE_ANCHOR_POINT;
-                    }
-                } else {
-                    targetState = mLastStableState;
-                }
-                switch (targetState) {
-                    case STATE_ANCHOR_POINT:
-                        top = mAnchorPoint;
-                        break;
-                    case STATE_COLLAPSED:
-                        top = mMaxOffset;
-                        break;
-                    case STATE_EXPANDED:
-                        top = mMinOffset;
-                        break;
-                    default:
-                        top = mAnchorPoint;
-
-                }
+                top = mMinOffset;
+                targetState = STATE_EXPANDED;
             }
-            else if ( mHideable  &&  shouldHide(releasedChild, yvel) ) {
+            else
+            if ( mHideable  &&  shouldHide(releasedChild, yvel) ) {
                 top = mParentHeight;
                 targetState = STATE_HIDDEN;
             }
             else
             if ( yvel == 0.f ) {
                 int currentTop = releasedChild.getTop();
-                int distToBottom = Math.abs(currentTop - mMaxOffset);
-                int distToAnchor = Math.abs(currentTop - mAnchorPoint);
-                int distToTop = Math.abs(currentTop - mMinOffset);
-                if (distToTop < distToBottom) {
-                    if (distToTop < distToAnchor) {
-                        top = mMinOffset;
-                        targetState = STATE_EXPANDED;
-                        // top
-                    } else {
-                        top = mAnchorPoint;
-                        targetState = STATE_ANCHOR_POINT;
-                        // anchor
-                    }
+                if (Math.abs(currentTop - mMinOffset) < Math.abs(currentTop - mMaxOffset)) {
+                    top = mMinOffset;
+                    targetState = STATE_EXPANDED;
                 } else {
-                    if (distToBottom < distToAnchor) {
-                        if (distToBottom == 0) {
-                            // handling click on bottom to make it go to anchor point
-                            top = mAnchorPoint;
-                            targetState = STATE_ANCHOR_POINT;
-                        } else {
-                            top = mMaxOffset;
-                            targetState = STATE_COLLAPSED;
-                        }
-
-                        // bottom
-                    } else {
-                        top = mAnchorPoint;
-                        targetState = STATE_ANCHOR_POINT;
-                        // anchor
-                    }
+                    top = mMaxOffset;
+                    targetState = STATE_COLLAPSED;
                 }
             } else {
                 top = mMaxOffset;
