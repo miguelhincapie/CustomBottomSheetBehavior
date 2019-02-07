@@ -446,6 +446,9 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
                     top = mAnchorPoint;
                     targetState = STATE_ANCHOR_POINT;
                 }
+                else if (mHideable && shouldHide(child, scrollVelocity)) {
+                    top = mParentHeight;
+                    targetState = STATE_HIDDEN;
                 else if(mCollapsible==true) {
                     if (mLastStableState == STATE_ANCHOR_POINT) {
                         // Fling from anchor to collapsed
@@ -463,22 +466,27 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
             }
             // Not flinging, just settle to the nearest state
             else {
-                // Collapse?
-                int currentTop = child.getTop();
-                if ( currentTop > mAnchorPoint * 1.25 && mCollapsible==true) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.
-                    top = mMaxOffset;
-                    targetState = STATE_COLLAPSED;
-                }
-                // Expand?
-                else
-                if ( currentTop < mAnchorPoint * 0.5 ) {
-                    top = mMinOffset;
-                    targetState = STATE_EXPANDED;
-                }
-                // Snap back to the anchor
-                else {
-                    top = mAnchorPoint;
-                    targetState = STATE_ANCHOR_POINT;
+                if (mHideable && shouldHide(child, scrollVelocity)) {
+                    top = mParentHeight;
+                    targetState = STATE_HIDDEN;
+                } else {
+                    // Collapse?
+                    int currentTop = child.getTop();
+                    if ( currentTop > mAnchorPoint * 1.25 && mCollapsible==true) { // Multiply by 1.25 to account for parallax. The currentTop needs to be pulled down 50% of the anchor point before collapsing.
+                        top = mMaxOffset;
+                        targetState = STATE_COLLAPSED;
+                    }
+                    // Expand?
+                    else
+                    if ( currentTop < mAnchorPoint * 0.5 ) {
+                        top = mMinOffset;
+                        targetState = STATE_EXPANDED;
+                    }
+                    // Snap back to the anchor
+                    else {
+                        top = mAnchorPoint;
+                        targetState = STATE_ANCHOR_POINT;
+                    }
                 }
             }
 
