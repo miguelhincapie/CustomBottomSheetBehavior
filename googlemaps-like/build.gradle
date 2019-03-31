@@ -27,4 +27,7 @@ dependencies {
 //    gradleVersion = '3.4.1'
 //}
 
-apply from: 'bintray.gradle'
+File localPropertiesFile = project.file("local.properties")
+if(localPropertiesFile.exists()){
+    apply from: 'bintray.gradle'
+}
