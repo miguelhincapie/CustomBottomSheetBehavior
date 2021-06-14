@@ -154,8 +154,8 @@ public class BottomSheetBehaviorGoogleMapsLike<V extends View> extends Coordinat
         mCollapsible = true;
         a = context.obtainStyledAttributes(attrs, R.styleable.CustomBottomSheetBehavior);
         if (attrs != null) {
-            mAnchorPoint = (int) a.getDimension( R.styleable.CustomBottomSheetBehavior_anchorPoint, 0);
-            mState = a.getInt(R.styleable.CustomBottomSheetBehavior_defaultState, STATE_ANCHOR_POINT);
+            mAnchorPoint = (int) a.getDimension( R.styleable.CustomBottomSheetBehavior_customBottomSheetBehaviorAnchorPoint, 0);
+            mState = a.getInt(R.styleable.CustomBottomSheetBehavior_customBottomSheetBehaviorDefaultState, STATE_ANCHOR_POINT);
         }
         a.recycle();
 
