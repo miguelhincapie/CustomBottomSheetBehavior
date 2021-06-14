@@ -52,7 +52,7 @@
         app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
         android:id="@+id/bottom_sheet"
         app:layout_behavior="@string/BottomSheetBehaviorGoogleMapsLike"
-        app:anchorPoint="@dimen/anchor_point"
+        app:customBottomSheetBehaviorAnchorPoint="@dimen/anchor_point"
         app:behavior_hideable="true"
         android:fitsSystemWindows="true">
 
